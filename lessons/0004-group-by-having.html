@@ -144,7 +144,7 @@ group by brand</pre>
 
 <section>
   <h2><span class="step">3</span><code>group by</code> אחרי צירוף</h2>
-  <div class="exam">🎓 <b>בסגנון בחינה (שאלה 6.4):</b> "לכל יצרן רכב, מצא את מספר התאונות שבהן היו מעורבות מכוניות של יצרן זה."</div>
+  <div class="exam">🎓 <b>שאלה ממבחן — מבחן 131112 · 2025 · סמסטר 1 · מועד 2 (קובץ <code>…_15480</code>) · שאלה 6.4</b> · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a>:<br>"לכל יצרן רכב, מצא את מספר התאונות שבהן היו מעורבות מכוניות של יצרן זה."</div>
   <p>היצרן ב‑<code>car</code>, התאונות ב‑<code>accident</code> — קודם מצרפים, אחר כך מקבצים:</p>
   <pre class="sql">select car.brand, count(*)
 from   accident join car on accident.license = car.license
@@ -188,8 +188,9 @@ having count(*) &gt; 3       -- (3) ואז מסננים קבוצות</pre>
 
 <section>
   <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
-  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". (מצב העריכה נבחר בפינה השמאלית העליונה.)</p>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלה שבמבחנים.</p>
 
+  <h3>חימום ותרגול</h3>
   <div class="ex">
     <div class="task">תרגיל 1 — כמה אנשים יש בסך הכול בטבלת <code>person</code>?</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
@@ -251,6 +252,43 @@ from   car
 group by brand
 having count(*) &gt; 5</pre>
       <p>תנאי על תוצאת ההקבצה ⟵ <code>having</code> (לא <code>where</code>!).</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <p style="margin-top:0; color:var(--muted)">עכשיו ברמת הבחינה. שימו לב — שאלה יכולה להשתמש בסכמה אחרת; היעזרו ב‑<a href="../reference/glossary.html">מילון הסכמות</a>.</p>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 6 (שאלה ממבחן 6.3 — ליבה) — לכל תאונה הצג את <code>accident_id</code>, את <b>מספר הרכבים</b> שהיו מעורבים בה, ואת <b>הנזק הממוצע לרכב</b>.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2025 · סמסטר 1 · מועד 2 (קובץ <code>…_15480</code>) · שאלה 6.3 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select accident_id, count(*), avg(damage)
+from   accident
+group by accident_id</pre>
+      <p>כל שורה ב‑<code>accident</code> היא רכב אחד בתאונה, לכן <code>count(*)</code> לכל <code>accident_id</code> = מספר הרכבים, ו‑<code>avg(damage)</code> = הנזק הממוצע לרכב. <b>השאלה המלאה (6.3)</b> מבקשת רק את התאונה עם הממוצע ה<b>גבוה ביותר</b> — את שלב המציאת‑מקסימום נלמד בשיעור 5.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 7 (שאלה ממבחן 7.4) — לכל ז'אנר הצג <code>genre_id</code>, <code>genre_name</code>, ואת <b>הממוצע</b> של מספר העותקים (<code>num_copies</code>) של הספרים בז'אנר.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2024 · סמסטר 2 · מועד 2 (קובץ <code>…_12219</code>) · שאלה 7.4 · סכמה <a href="../reference/glossary.html#schemas">ג' — ספרייה</a></p>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Genres(genre_id, genre_name)</code> · <code>Book_Genres(isbn, genre_id)</code> · <code>Books(isbn, …, num_copies)</code></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select Genres.genre_id, Genres.genre_name, avg(Books.num_copies)
+from   Genres join Book_Genres on Genres.genre_id = Book_Genres.genre_id
+              join Books       on Book_Genres.isbn = Books.isbn
+group by Genres.genre_id, Genres.genre_name</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select Genres.genre_id, Genres.genre_name, avg(Books.num_copies)
+from   Genres, Book_Genres, Books
+where  Genres.genre_id = Book_Genres.genre_id
+  and  Book_Genres.isbn = Books.isbn
+group by Genres.genre_id, Genres.genre_name</pre>
+      <p>צירוף שלוש טבלאות (<code>Genres → Book_Genres → Books</code>), הקבצה לפי ז'אנר, וממוצע <code>num_copies</code>. שימו לב: <code>genre_name</code> שב‑<code>select</code> חייב להופיע גם ב‑<code>group by</code> (כלל ה‑<code>group by</code>).</p>
     </div>
   </div>
 </section>

@@ -139,7 +139,7 @@ where  lname like '%tov%'</pre>
 
 <section>
   <h2><span class="step">4</span>שילוב <code>like</code> עם צירוף — שאלת בחינה אמיתית</h2>
-  <div class="exam">🎓 <b>מתוך בחינה אמיתית (סמסטר א' 2025, מועד ב', שאלה 6.2):</b> "מצא את התאונות שמעורבים בהן רכבים של לקוחות ששם משפחתם מכיל <code>'tov'</code>. הצג מספר תאונה, מספר רכב, תאריך, ושם מלא של הבעלים."</div>
+  <div class="exam">🎓 <b>שאלה אמיתית — מבחן 131112 · 2025 · סמסטר 1 · מועד 2 (קובץ <code>…_15480</code>, קב' 13111202) · שאלה 6.2</b> · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a>:<br>"מצא את התאונות שמעורבים בהן רכבים של לקוחות ששם משפחתם מכיל <code>'tov'</code>. הצג מספר תאונה, מספר רכב, תאריך, ושם מלא של הבעלים."</div>
   <p>השם נמצא ב‑<code>person</code>, הקשר לרכב ב‑<code>owns</code>, והתאונה ב‑<code>accident</code> — צירוף של שלוש טבלאות, ועליו תנאי <code>like</code>:</p>
   <pre class="sql">select distinct accident.accident_id, accident.license, accident.date,
                 person.fname, person.lname
@@ -197,7 +197,8 @@ where  model like '%X%'</pre>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 4 (בסגנון בחינה) — הצג <code>accident_id</code>, <code>license</code>, <code>date</code> ושם מלא של הבעלים, עבור תאונות של רכבים שבעליהם <b>שם משפחתם מכיל</b> <code>'tov'</code>.</div>
+    <div class="task">🎓 תרגיל 4 (שאלה ממבחן) — הצג <code>accident_id</code>, <code>license</code>, <code>date</code> ושם מלא של הבעלים, עבור תאונות של רכבים שבעליהם <b>שם משפחתם מכיל</b> <code>'tov'</code>.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2025 · סמסטר 1 · מועד 2 (קובץ <code>…_15480</code>) · שאלה 6.2 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">

@@ -11,6 +11,7 @@
 - Self-contained HTML page, system Hebrew fonts (no CDN). Open with: `open lessons/NNNN-*.html`
 - Each lesson: ONE skill, knowledge first then interactive practice (write-query-then-reveal + MCQ with instant feedback), citations to `src/` slides, reminder to ask the teacher (agent) follow-ups.
 - **JOIN SOLUTIONS: always show `join ... on` FIRST (preferred), then comma+`where` as a labeled secondary** (natural join where clean). User preference — see memory `sql-lessons-prefer-join-on`. Single-table answers unaffected.
+- **PRACTICE MUST ESCALATE INTO REAL EXAM QUESTIONS.** Each lesson's practice = warm-up → practice → a "שאלות ממבחנים" tier with 1–2 real `test/` exam questions (badge 🎓, cite exam, full solution, correct `data-schema`). The mission is solving every exam. See memory `sql-lessons-include-exam-questions`. Map of exam Qs → skills is in the exam question-space section above.
 
 ## EVERY lesson uses the SQL-blocks controller — `assets/sql-blocks.js`
 - ONE include in `<head>`: `<script src="../assets/sql-blocks.js" defer></script>`.
