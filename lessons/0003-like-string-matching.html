@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 3 · התאמת מחרוזות (like)</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 3 · התאמת מחרוזות</div>
+  <h1>like — חיפוש לפי תבנית טקסט</h1>
+  <p>איך מסננים לפי "מכיל", "מתחיל ב‑", "מסתיים ב‑". שאלה שחוזרת כמעט בכל בחינה: "מצא לקוחות ששם משפחתם <b>מכיל</b> את הרצף <code>'tov'</code>".</p>
+  <div class="goal">🎯 <b>היעד:</b> לכתוב תנאי <code>where</code> שמתאים מחרוזות חלקיות בעזרת <code>like</code> והתווים <code>%</code> ו‑<code>_</code>.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה:</b> שיעור 1 — <code>select/from/where</code>; שיעור 2 — צירוף טבלאות. עכשיו נחדד את ה‑<code>where</code>: סינון לפי <b>תבנית</b> ולא רק לפי שוויון מדויק.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>שוב סכמת <b>חברת ביטוח הרכב</b>. נתמקד בעמודות טקסט: <code>fname</code>, <code>lname</code>, <code>city</code>, <code>model</code>, <code>brand</code>.</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות (רלוונטיות)</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>street</code>, <code>city</code>, <code>birth</code></td></tr>
+    <tr><td><code>owns</code></td><td><u><code>id</code>, <code>license</code></u></td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, …</td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html">מילון המונחים והסכמות ←</a></p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>האופרטור <code>like</code> ושני תווי הבר</h2>
+  <p>במקום <code>=</code> (שוויון מדויק) משתמשים ב‑<code>like</code> כדי להתאים <b>תבנית</b>. שני תווים מיוחדים (מצגת פרק 3, שקופית 17):</p>
+  <table>
+    <tr><th>תו</th><th>משמעות</th></tr>
+    <tr><td><code>%</code></td><td>כל רצף תווים — כולל רצף ריק (אפס תווים או יותר).</td></tr>
+    <tr><td><code>_</code></td><td>תו <b>בודד</b> אחד בדיוק.</td></tr>
+  </table>
+  <p>למצוא את כל מי ששם משפחתו <b>מכיל</b> את הרצף <code>'tov'</code> (איפשהו בתוך השם):</p>
+  <pre class="sql">select fname, lname
+from   person
+where  lname like '%tov%'</pre>
+  <p>ה‑<code>%</code> משני הצדדים אומר: "כל דבר, אחר כך <code>tov</code>, אחר כך כל דבר" — כלומר <code>tov</code> בכל מקום במחרוזת.</p>
+</section>
+
+<section>
+  <h2><span class="step">2</span>ספר התבניות</h2>
+  <p>כל התבניות הנפוצות במקום אחד. שימו לב איפה ה‑<code>%</code> יושב:</p>
+  <table>
+    <tr><th>תבנית</th><th>מתאימה ל…</th><th>דוגמה שמתאימה</th></tr>
+    <tr><td><code>'tov%'</code></td><td><b>מתחיל</b> ב‑<code>tov</code></td><td><code>tov</code>, <code>tover</code></td></tr>
+    <tr><td><code>'%tov'</code></td><td><b>מסתיים</b> ב‑<code>tov</code></td><td><code>shemtov</code>, <code>simantov</code></td></tr>
+    <tr><td><code>'%tov%'</code></td><td><b>מכיל</b> <code>tov</code> איפשהו</td><td><code>shem tov levi</code></td></tr>
+    <tr><td><code>'t_v'</code></td><td><code>t</code>, תו בודד כלשהו, ואז <code>v</code> — <b>בדיוק 3 תווים</b></td><td><code>tov</code>, <code>tav</code> (לא <code>toov</code>)</td></tr>
+    <tr><td><code>'a%n'</code></td><td>מתחיל ב‑<code>a</code> ומסתיים ב‑<code>n</code></td><td><code>aaron</code>, <code>an</code></td></tr>
+  </table>
+  <div class="note">💡 <code>_</code> = בדיוק תו אחד; <code>%</code> = אפס תווים או יותר. <code>'t_v'</code> דורש אורך 3 בדיוק; <code>'t%v'</code> מקבל גם <code>tv</code> וגם <code>toooov</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>אותיות גדולות/קטנות (case sensitive)</h2>
+  <p>במצגת הקורס (פרק 3, שקופית 17) נכתב במפורש: התאמת תבניות היא <b><code>case sensitive</code></b>. כלומר <code>'%tov%'</code> <b>לא</b> יתאים ל‑<code>'Tov'</code> או ל‑<code>'TOV'</code>.</p>
+  <div class="warn">⚠️ בבחינה שמופיע בה רצף כמו <code>'tov'</code>, בדרך כלל נאמר "הניחו שכל השמות שמורים באותיות קטנות". סמכו על ההנחה הזו וכתבו את התבנית באותיות קטנות. אם לא נאמר — שווה לציין את ההנחה בתשובה.</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>שילוב <code>like</code> עם צירוף — שאלת בחינה אמיתית</h2>
+  <div class="exam">🎓 <b>מתוך בחינה אמיתית (סמסטר א' 2025, מועד ב', שאלה 6.2):</b> "מצא את התאונות שמעורבים בהן רכבים של לקוחות ששם משפחתם מכיל <code>'tov'</code>. הצג מספר תאונה, מספר רכב, תאריך, ושם מלא של הבעלים."</div>
+  <p>השם נמצא ב‑<code>person</code>, הקשר לרכב ב‑<code>owns</code>, והתאונה ב‑<code>accident</code> — צירוף של שלוש טבלאות, ועליו תנאי <code>like</code>:</p>
+  <pre class="sql">select distinct accident.accident_id, accident.license, accident.date,
+                person.fname, person.lname
+from   accident join owns   on accident.license = owns.license
+               join person on owns.id = person.id
+where  person.lname like '%tov%'</pre>
+  <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+  <pre class="sql">select distinct accident.accident_id, accident.license, accident.date,
+                person.fname, person.lname
+from   accident, owns, person
+where  accident.license = owns.license
+  and  owns.id = person.id
+  and  person.lname like '%tov%'</pre>
+  <p>הכול מתחבר: שיעור 2 (צירוף שלוש טבלאות) + שיעור 3 (<code>like</code>). זה בדיוק סוג השאלה שתפגשו בחלק ב'. (ה‑<code>distinct</code> כאן הוא ליתר ביטחון בלבד — בשאילתה הזו הוא מיותר; ההסבר המלא בתרגיל 4.)</p>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". (אפשר לבחור מצב עריכה — השלמה / צביעה / רגיל — בפינה השמאלית העליונה.)</p>
+
+  <div class="ex">
+    <div class="task">תרגיל 1 — הצג שם פרטי ושם משפחה של כל מי ש<b>שם משפחתו מכיל</b> את הרצף <code>'tov'</code>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select fname, lname
+from   person
+where  lname like '%tov%'</pre>
+      <p>"מכיל" ⟵ <code>%</code> משני הצדדים.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 — הצג את האנשים ש<b>שמם הפרטי מתחיל</b> באות <code>'A'</code>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select fname, lname
+from   person
+where  fname like 'A%'</pre>
+      <p>"מתחיל ב‑" ⟵ ה‑<code>%</code> רק בסוף. (זכרו: <code>case sensitive</code> — <code>'A%'</code> לא יתאים ל‑<code>'a...'</code>.)</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 — הצג את <code>license</code> ו‑<code>model</code> של כל הרכבים ש<b>הדגם שלהם מכיל</b> את הרצף <code>'X'</code>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select license, model
+from   car
+where  model like '%X%'</pre>
+      <p>אותו דפוס "מכיל", הפעם על עמודת <code>model</code>.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 (בסגנון בחינה) — הצג <code>accident_id</code>, <code>license</code>, <code>date</code> ושם מלא של הבעלים, עבור תאונות של רכבים שבעליהם <b>שם משפחתם מכיל</b> <code>'tov'</code>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select distinct accident.accident_id, accident.license, accident.date,
+                person.fname, person.lname
+from   accident join owns   on accident.license = owns.license
+               join person on owns.id = person.id
+where  person.lname like '%tov%'</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select distinct accident.accident_id, accident.license, accident.date,
+                person.fname, person.lname
+from   accident, owns, person
+where  accident.license = owns.license
+  and  owns.id = person.id
+  and  person.lname like '%tov%'</pre>
+      <p>צירוף שלוש טבלאות (<code>accident → owns → person</code>) + תנאי <code>like</code>. זו בדיוק שאלה 6.2 מהבחינה.<br>
+      <b>למה <code>distinct</code>?</b> בשאילתה הזו הוא למעשה <b>מיותר</b>: שם הבעלים (<code>fname, lname</code>) נמצא ב‑<code>select</code>, וכל צירוף של (תאונה ↔ בעלים) הוא ייחודי — אז אין שתי שורות זהות שצריך לאחד. רכב עם שני בעלים שעונים על התנאי ייתן שתי שורות <b>שונות</b> (שם שונה), ו‑<code>distinct</code> ממילא לא מאחד אותן. הוא היה נחוץ רק אילו היינו משמיטים את שם הבעלים מהפלט (למשל רק <code>accident_id, license, date</code>) — אז לרכב עם כמה בעלים תואמים היו צצות שורות זהות. נהוג להוסיף <code>distinct</code> ליתר ביטחון בצירופים, אבל כדאי לדעת מתי הוא באמת עובד.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. למה מתאימה התבנית <code>'%ha%'</code>?</div>
+    <button class="opt" onclick="pick(this,0)">למחרוזות שהן בדיוק <code>ha</code></button>
+    <button class="opt" onclick="pick(this,1)">לכל מחרוזת ש<code>ha</code> מופיע בה איפשהו</button>
+    <button class="opt" onclick="pick(this,0)">למחרוזות שמתחילות ב‑<code>ha</code> בלבד</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. לכמה תווים מתאים התו <code>_</code> בתבנית?</div>
+    <button class="opt" onclick="pick(this,1)">בדיוק תו אחד</button>
+    <button class="opt" onclick="pick(this,0)">אפס תווים או יותר</button>
+    <button class="opt" onclick="pick(this,0)">שני תווים בדיוק</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. האם <code>where lname like '%tov%'</code> יתאים לערך <code>'Tov'</code> (עם T גדולה)?</div>
+    <button class="opt" onclick="pick(this,1)">לא — התאמת התבניות היא case sensitive</button>
+    <button class="opt" onclick="pick(this,0)">כן — like מתעלם מאותיות גדולות/קטנות</button>
+    <button class="opt" onclick="pick(this,0)">רק אם מוסיפים <code>distinct</code></button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. איזו תבנית מתאימה למחרוזות באורך <b>3 בדיוק</b> שמתחילות ב‑<code>t</code> ומסתיימות ב‑<code>v</code>?</div>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">'t%v'</button>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">'t_v'</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">'tv'</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">רוצה לראות איך מחפשים תבנית שמכילה תו <code>%</code> ממשי? או איך משלבים <code>like</code> עם <code>not</code> ("לא מכיל")? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 4 — הקבצה וסיכום: <code>group by</code>, <code>having</code> ופונקציות הקבצה.</b> כאן מתחילים לענות על שאלות "כמה", "ממוצע", "לכל קבוצה" — לב ליבן של שאלות הבחינה (מספר תאונות לכל יצרן, ממוצע נזק, וכו').
+  </div>
+</section>
+
+<footer>
+  שיעור 3 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (שקופית 17) ושאלה 6.2 מהבחינות<br>
+  לפתיחה: <code>open lessons/0003-like-string-matching.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

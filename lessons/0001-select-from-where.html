@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 1 · select–from–where</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  .schema code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .map{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0}
+  .map .cell{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 16px}
+  .map .cell b{color:var(--primary)}
+  /* interactive */
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:78px; direction:ltr; text-align:left; font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:14.5px; border:1px solid var(--line); border-radius:10px; padding:10px; resize:vertical; background:#fff}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media (max-width:560px){.map{grid-template-columns:1fr}}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 1 · יסודות</div>
+  <h1>select – from – where</h1>
+  <p>השלד של כל שאילתת SQL. אחרי השיעור הזה תדעו לשלוף עמודות, לסנן שורות, ולהיפטר מכפילויות — הלבנים שכל שאר הקורס בנוי עליהן.</p>
+  <div class="goal">🎯 <b>היעד:</b> לכתוב שאילתות שמסננות שורות מטבלה אחת — בדיוק כמו שאלות פתיחה בחלק ב' של הבחינה (לדוגמה: "מצא את כל הרכבים מתוצרת מסוימת").</div>
+</header>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> — הסכמה הנפוצה ביותר בבחינות. בשיעור הזה נשתמש בעיקר בשתי טבלאות (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>street</code>, <code>city</code>, <code>birth</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">הסכמה המלאה וכל יתר הסכמות נמצאות ב‑<a href="../reference/glossary.html">מילון המונחים והסכמות ←</a></p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>שלוש שורות, שלוש שאלות</h2>
+  <p>שאילתה בסיסית עונה על שלוש שאלות. זכרו אותן ותמיד תדעו מאיפה להתחיל:</p>
+  <pre class="sql">select  brand, model    -- אילו עמודות?  (which columns)
+from    car             -- מאיזו טבלה?   (which table)
+where   year &gt; 2020      -- אילו שורות?   (which rows)</pre>
+  <p>בעברית: "<b>הצג</b> את היצרן והדגם <b>מתוך</b> טבלת הרכבים, <b>עבור</b> רכבים שיוצרו אחרי 2020."</p>
+
+  <h3>הקשר לאלגברת היחסים</h3>
+  <p>המצגת (פרק 3, שקופית 3) מלמדת ש‑SQL הוא בעצם קיצור לשלוש פעולות מאלגברת היחסים. <b>זה בדיוק מה שנבדק בשאלות האמריקאיות בחלק א'!</b></p>
+  <div class="map">
+    <div class="cell"><b>select</b> = הטלה <code>π</code> (בחירת עמודות)</div>
+    <div class="cell"><b>where</b> = בחירה <code>σ</code> (סינון שורות)</div>
+    <div class="cell"><b>from</b> = מכפלה <code>×</code> (הטבלאות)</div>
+    <div class="cell" style="direction:ltr; text-align:center"><code>π<sub>brand,model</sub>( σ<sub>year&gt;2020</sub>( car ) )</code></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="step">2</span>distinct — מחיקת כפילויות</h2>
+  <p>שאילתת SQL <b>אינה</b> מוחקת שורות כפולות מעצמה (זה ההבדל מאלגברת היחסים — מצגת פרק 3, שקופית 4). אם נשלוף את כל הערים:</p>
+  <pre class="sql">select  city
+from    person      -- 'Haifa' עלולה להופיע 500 פעמים</pre>
+  <p>נקבל את <code>'Haifa'</code> פעם אחת לכל אדם שגר בה. כדי לקבל כל ערך פעם אחת בלבד מוסיפים <code>distinct</code>:</p>
+  <pre class="sql">select distinct city
+from   person       -- כל עיר פעם אחת בלבד</pre>
+  <div class="note">⚠️ טעות נפוצה בבחינה: לשכוח <code>distinct</code> כששואלים "מצא את <b>רשימת</b> ה‑X" או "אילו X שונים". אם השאלה רומזת על ערכים ייחודיים — הוסיפו <code>distinct</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>שני קיצורים שימושיים</h2>
+  <h3><code>select *</code> — כל העמודות</h3>
+  <p>כשרוצים את כל הפרטים של שורה (בבחינה: "הצג את <b>הפרטים המלאים</b> של..."), הכוכבית מחליפה רשימת עמודות (מצגת פרק 3, שקופית 6):</p>
+  <pre class="sql">select *
+from   car
+where  brand = 'Tesla'</pre>
+  <h3>תנאים מורכבים — <code>and</code>, <code>or</code>, <code>not</code></h3>
+  <p>מחברים תנאים עם <code>and</code> / <code>or</code> (במקום ∧ ∨). שימו לב: מחרוזות תמיד בגרשיים בודדים <code>'...'</code>.</p>
+  <pre class="sql">select *
+from   car
+where  brand = 'Tesla' and year &gt;= 2022</pre>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו לכתוב כל שאילתה בעצמכם <b>לפני</b> שתלחצו "הצג פתרון". כתבו SQL באנגלית (משמאל לימין). אין לחיצה אחת נכונה — השוו לפתרון והבינו את הרעיון.</p>
+
+  <div class="ex">
+    <div class="task">תרגיל 1 — הצג את היצרן (<code>brand</code>) והדגם (<code>model</code>) של כל הרכבים שיוצרו אחרי שנת 2020.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select brand, model
+from   car
+where  year &gt; 2020</pre>
+      <p>בחרנו שתי עמודות (<code>select</code>), מטבלה אחת (<code>from</code>), עם תנאי על השנה (<code>where</code>).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 — הצג את <b>רשימת הערים השונות</b> שבהן גרים אנשים (כל עיר פעם אחת).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select distinct city
+from   person</pre>
+      <p>"רשימת ערים שונות" = ערכים ייחודיים ⟵ חובה <code>distinct</code>. אין כאן תנאי, אז אין <code>where</code>.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 — הצג את <b>הפרטים המלאים</b> של כל רכבי <code>'Tesla'</code> משנת 2022 ואילך.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select *
+from   car
+where  brand = 'Tesla' and year &gt;= 2022</pre>
+      <p>"פרטים מלאים" ⟵ <code>select *</code>. שני תנאים מחוברים ב‑<code>and</code>. מחרוזת בגרשיים בודדים, מספר בלי גרשיים.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. מה ההבדל בין <code>select city from person</code> לבין <code>select distinct city from person</code>?</div>
+    <button class="opt" onclick="pick(this,0)">אין הבדל — שתיהן מחזירות כל עיר פעם אחת</button>
+    <button class="opt" onclick="pick(this,1)">הראשונה עלולה להחזיר ערים כפולות; השנייה מחזירה כל עיר פעם אחת</button>
+    <button class="opt" onclick="pick(this,0)">השנייה מסננת שורות לפי תנאי</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. איזה פסוק אחראי על <b>סינון השורות</b> (איזה שורות יוחזרו)?</div>
+    <button class="opt" onclick="pick(this,0)"><code>select</code></button>
+    <button class="opt" onclick="pick(this,0)"><code>from</code></button>
+    <button class="opt" onclick="pick(this,1)"><code>where</code></button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. לאיזה ביטוי באלגברת היחסים שקולה השאילתה <code>select brand from car where year &gt; 2020</code>? (שאלה בסגנון חלק א')</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">π<sub>brand</sub>( σ<sub>year&gt;2020</sub>( car ) )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">σ<sub>brand</sub>( π<sub>year&gt;2020</sub>( car ) )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">π<sub>year&gt;2020</sub>( car )</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">לא ברור משהו? רוצה עוד תרגיל? רוצה שאסביר למה <code>= null</code> אסור, או מתי בדיוק צריך <code>distinct</code>? כתוב לי בצ'אט ונפתור ביחד לפני שנמשיך.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 2 — צירוף טבלאות (joins).</b> כמעט כל שאלת בחינה דורשת לחבר כמה טבלאות (למשל: שם הבעלים של רכב = <code>person</code> + <code>owns</code> + <code>car</code>). זה הצעד הגדול הבא. תרגלו את שיעור 1 עד שהוא אוטומטי, ואז נתקדם.
+  </div>
+</section>
+
+<footer>
+  שיעור 1 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (שקופיות 2–6)<br>
+  לפתיחה: <code>open lessons/0001-select-from-where.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

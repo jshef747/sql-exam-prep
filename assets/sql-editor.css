@@ -1,0 +1,78 @@
+/* sql-editor.css — shared mini-IDE for SQL practice boxes.
+   Editor content is ALWAYS English LTR; the page around it stays RTL.
+   DO NOT restyle `textarea` inside `.sqle` / `.sqle-area` from a lesson stylesheet:
+   the transparent color+background is what makes the highlight overlay work, and
+   overriding the background while leaving color:transparent would hide typed text. */
+
+.sqle{
+  position:relative; display:flex; direction:ltr; text-align:left;
+  border:1px solid var(--line,#e2e8f2); border-radius:10px; background:#fff;
+  box-shadow:inset 0 1px 2px rgba(20,40,80,.04); overflow:hidden;
+}
+.sqle.focused{border-color:var(--primary,#2b4a8b); box-shadow:0 0 0 3px rgba(43,74,139,.12)}
+
+/* line-number gutter */
+.sqle-gutter{
+  flex:0 0 auto; min-width:36px; padding:10px 8px 10px 6px; overflow:hidden;
+  background:#f3f5f9; border-right:1px solid var(--line,#e2e8f2);
+  color:#9aa7bd; user-select:none; text-align:right;
+  /* font-size + line-height MUST match the code layer below, or line numbers drift */
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+}
+.sqle-gutter span{display:block}
+
+/* the overlay area: highlighted <pre> behind a transparent <textarea> */
+.sqle-area{position:relative; flex:1 1 auto; min-width:0}
+/* `.sqle` is repeated to raise specificity above any lesson `.ex textarea` rule,
+   so the transparent overlay can never be silently overridden into invisible text. */
+.sqle-hl, .sqle.sqle .sqle-area textarea{
+  margin:0; border:0; padding:10px 12px;
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+  white-space:pre; tab-size:2; -moz-tab-size:2;
+}
+.sqle-hl{
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+  color:#1a2233; z-index:0;
+}
+.sqle.sqle .sqle-area textarea{
+  position:relative; display:block; width:100%; min-height:88px; height:100%;
+  background:transparent; color:transparent; caret-color:#1a2233;
+  resize:vertical; outline:none; overflow:auto; z-index:1; white-space:pre;
+}
+.sqle .sqle-area textarea::placeholder{color:#9aa7bd}
+.sqle .sqle-area textarea::selection{background:rgba(43,74,139,.22)}
+
+/* token colors (shared with static pre.sql) */
+.sqle-hl .kw, pre.sql .kw{color:#1d4ed8; font-weight:700}
+.sqle-hl .str, pre.sql .str{color:#b45309}
+.sqle-hl .cmt, pre.sql .cmt{color:#6b7280; font-style:italic}
+.sqle-hl .num, pre.sql .num{color:#0a7ea4}
+
+/* autocomplete popup */
+.sqle-pop{
+  position:absolute; z-index:60; min-width:190px; max-width:320px; max-height:208px; overflow:auto;
+  background:#fff; border:1px solid #cfdcf3; border-radius:9px; padding:4px;
+  box-shadow:0 10px 28px rgba(20,40,80,.20);
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:13.5px;
+  direction:ltr; text-align:left;
+}
+.sqle-pop .it{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:5px 9px; border-radius:6px; cursor:pointer; white-space:nowrap;
+}
+.sqle-pop .it:hover{background:#f1f5fc}
+.sqle-pop .it.active{background:var(--primary-soft,#eaf0fb)}
+.sqle-pop .it .lbl{color:#1a2233}
+.sqle-pop .it.kw  .lbl{color:#1d4ed8; font-weight:700}
+.sqle-pop .it .ty{font-size:10.5px; letter-spacing:.04em; text-transform:uppercase; color:#9aa7bd}
+.sqle-pop .it .ty.t-table{color:#0b8457}
+.sqle-pop .it .ty.t-col{color:#a4690b}
+
+/* tiny hint line under each editor */
+.sqle-hint{
+  direction:rtl; text-align:left; font-size:12px; color:#9aa7bd; margin:4px 2px 0;
+  font-family:'Heebo','Assistant',Arial,sans-serif;
+}
+.sqle-hint code{direction:ltr; background:#eef2f8; padding:0 4px; border-radius:4px; color:#5b6b86}
+
+@media print{ .sqle-pop{display:none!important} }

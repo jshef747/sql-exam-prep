@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 2 · צירוף טבלאות (joins)</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.sql .num{color:#0a7ea4}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .map{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0}
+  .map .cell{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 16px}
+  .map .cell b{color:var(--primary)}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:6px 14px; font-weight:700; font-family:ui-monospace,Menlo,monospace}
+  .flow .lnk{color:var(--muted); font-size:13px; font-family:ui-monospace,Menlo,monospace}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media (max-width:560px){.map{grid-template-columns:1fr}}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 2 · צירוף טבלאות</div>
+  <h1>joins — לחבר מידע מכמה טבלאות</h1>
+  <p>הצעד הגדול הבא. כמעט כל שאלת SQL בבחינה דורשת לאסוף מידע שמפוזר על פני שתי טבלאות או יותר. אחרי השיעור הזה תדעו לחבר אותן נכון.</p>
+  <div class="goal">🎯 <b>היעד:</b> לכתוב שאילתה ששולפת מידע מכמה טבלאות יחד — למשל "מה <b>שם הבעלים</b> של רכב?", כששם הבעלים נמצא בטבלה <code>person</code> אבל הקשר לרכב נמצא בטבלה <code>owns</code>.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>מה היה בשיעור 1:</b> <code>select</code> (אילו עמודות), <code>from</code> (מאיזו טבלה), <code>where</code> (אילו שורות), ו‑<code>distinct</code>. עכשיו ה‑<code>from</code> יקבל יותר מטבלה אחת.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>שוב סכמת <b>חברת ביטוח הרכב</b>. שימו לב לעמודות המשותפות — הן ה"דבק" שמחבר בין הטבלאות (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th><th>מתחבר ל…</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>city</code>, …</td><td>—</td></tr>
+    <tr><td><code>owns</code></td><td><u><code>id</code>, <code>license</code></u></td><td><code>id</code>→person · <code>license</code>→car</td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td><td>—</td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>damage</code>, <code>garage_id</code></td><td><code>license</code>→car · <code>garage_id</code>→garage</td></tr>
+    <tr><td><code>garage</code></td><td><u><code>garage_id</code></u>, <code>garage_name</code>, <code>city</code>, …</td><td>—</td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html">מילון המונחים והסכמות ←</a></p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>הבעיה: המידע מפוזר</h2>
+  <p>נניח שאנחנו רוצים את <b>שמות הבעלים של כל הרכבים</b>. השמות (<code>fname</code>, <code>lname</code>) יושבים ב‑<code>person</code>, אבל מי מחזיק איזה רכב יושב ב‑<code>owns</code>. אף טבלה לבדה לא מספיקה — צריך <b>לחבר</b> אותן.</p>
+  <div class="flow">
+    <span class="t">person</span><span class="lnk">— id —</span><span class="t">owns</span><span class="lnk">— license —</span><span class="t">car</span>
+  </div>
+  <p>החיבור נעשה דרך העמודה המשותפת: <code>person.id</code> שווה ל‑<code>owns.id</code>.</p>
+</section>
+
+<section>
+  <h2><span class="step">2</span>הצירוף הבסיסי: שתי טבלאות ב‑<code>from</code></h2>
+  <p>פשוט שמים את שתי הטבלאות ב‑<code>from</code> (מופרדות בפסיק) ומוסיפים את <b>תנאי הצירוף</b> ב‑<code>where</code>:</p>
+  <pre class="sql">select distinct person.fname, person.lname
+from   person, owns
+where  person.id = owns.id</pre>
+  <p>תנאי הצירוף <code>person.id = owns.id</code> הוא הלב של העניין. הוא מתאים כל אדם לרכבים שלו.</p>
+
+  <div class="warn">⚠️ <b>הטעות הכי מסוכנת בבחינה — לשכוח את תנאי הצירוף.</b> בלי ה‑<code>where</code>, שתי טבלאות ב‑<code>from</code> נותנות <b>מכפלה קרטזית</b> (<code>×</code>): כל שורה ב‑<code>person</code> משולבת עם כל שורה ב‑<code>owns</code> — אלפי שילובים חסרי משמעות. תמיד ודאו שכל טבלה נוספת מחוברת בתנאי.</div>
+
+  <h3>הקשר לאלגברת היחסים</h3>
+  <p>תנאי הצירוף על העמודה המשותפת הופך את המכפלה הקרטזית ל‑<b>צירוף טבעי</b> (מצגת פרק 3, שקופית 7):</p>
+  <p style="text-align:center; direction:ltr"><code>&nbsp;σ<sub>person.id = owns.id</sub>( person × owns )&nbsp;&nbsp;≈&nbsp;&nbsp;person ⋈ owns&nbsp;</code></p>
+  <p style="text-align:center; color:var(--muted); font-size:14px; margin-top:-2px">(הצירוף הטבעי <code>⋈</code> ממזג את עמודת <code>id</code> המשותפת לעמודה אחת; הצירוף עם <code>where</code> משאיר את שתיהן.)</p>
+  <p>ואז ה‑<code>select</code> מטיל (<code>π</code>) את העמודות שביקשנו — <b>אחרי</b> הצירוף:</p>
+  <p style="text-align:center; direction:ltr"><code>&nbsp;π<sub>fname,lname</sub>( σ<sub>person.id = owns.id</sub>( person × owns ) )&nbsp;</code></p>
+</section>
+
+<section>
+  <h2><span class="step">3</span>שלוש דרכים לכתוב את אותו צירוף</h2>
+  <p>המצגת (פרק 3, שקופית 8) מציגה שלוש כתיבות שקולות. כולן נכונות — בבחינה בחרו את מה שנוח לכם, אבל דעו לזהות את כולן:</p>
+  <h3>א · פסיק + <code>where</code> (הקלאסי)</h3>
+  <pre class="sql">select distinct person.fname, person.lname
+from   person, owns
+where  person.id = owns.id</pre>
+  <h3>ב · <code>join ... on</code></h3>
+  <pre class="sql">select distinct person.fname, person.lname
+from   person join owns on (person.id = owns.id)</pre>
+  <h3>ג · צירוף טבעי / <code>using</code></h3>
+  <pre class="sql">select distinct fname, lname
+from   person natural join owns       -- מחבר אוטומטית לפי כל עמודה משותפת (כאן: id)</pre>
+  <div class="note">💡 <b>צירוף טבעי</b> מחבר לפי <b>כל</b> העמודות בעלות אותו שם. כאן ל‑<code>person</code> ול‑<code>owns</code> משותפת רק <code>id</code>, אז זה עובד מצוין. היזהרו ממנו כששתי טבלאות חולקות עמודה במקרה (למשל <code>city</code> מופיע גם ב‑<code>person</code> וגם ב‑<code>garage</code>).</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>שלוש טבלאות בשרשרת</h2>
+  <p>כדי לקבל את <b>שם הבעלים + יצרן הרכב</b> צריך לעבור דרך שלוש טבלאות: <code>person → owns → car</code>. מוסיפים טבלה, ולכל קישור — תנאי צירוף משלו:</p>
+  <pre class="sql">select distinct person.fname, person.lname, car.brand
+from   person, owns, car
+where  person.id = owns.id
+  and  owns.license = car.license</pre>
+  <p>שימו לב: <b>שני</b> תנאי צירוף (אחד לכל "חוליה" בשרשרת), מחוברים ב‑<code>and</code>. כלל אצבע: ל‑N טבלאות צריך לפחות N−1 תנאי צירוף.</p>
+</section>
+
+<section>
+  <h2><span class="step">5</span>הבהרת עמודות וכינויים (aliases)</h2>
+  <p>כש‑עמודה באותו שם קיימת ביותר מטבלה אחת (כמו <code>id</code> או <code>license</code>), <b>חובה</b> לציין מאיזו טבלה: <code>person.id</code>, לא סתם <code>id</code> (אחרת השאילתה דו‑משמעית).</p>
+  <p>אפשר לתת לטבלה <b>כינוי</b> קצר כדי לחסוך כתיבה (מצגת פרק 3, שקופית 14):</p>
+  <pre class="sql">select distinct p.fname, p.lname, c.brand
+from   person p, owns o, car c
+where  p.id = o.id
+  and  o.license = c.license</pre>
+  <p>הכינויים (<code>p</code>, <code>o</code>, <code>c</code>) הם גם הדרך היחידה לחבר טבלה <b>לעצמה</b> — טריק שנפגוש בשיעור מתקדם יותר.</p>
+  <div class="note">🔁 <b>למה <code>distinct</code>?</b> צירוף עלול לייצר שורות כפולות (אדם עם שני רכבים יופיע פעמיים). אם רוצים כל שם פעם אחת — הוסיפו <code>distinct</code>.</div>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>השתמשו בעורך עם ההשלמה האוטומטית. נסו בעצמכם <b>לפני</b> "הצג פתרון". טיפ: התחילו תמיד מהשאלה "אילו טבלאות אני צריך?" ואז "איך הן מתחברות?".</p>
+
+  <div class="ex">
+    <div class="task">תרגיל 1 — הצג את <b>השמות המלאים של כל בעלי הרכבים</b> (כל בעלים פעם אחת).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select distinct fname, lname
+from   person join owns on person.id = owns.id</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select distinct person.fname, person.lname
+from   person, owns
+where  person.id = owns.id</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— או צירוף טבעי (עמודה משותפת: <code>id</code>):</p>
+      <pre class="sql">select distinct fname, lname
+from   person natural join owns</pre>
+      <p>שתי טבלאות: השמות ב‑<code>person</code>, הקשר לבעלוּת ב‑<code>owns</code>. תנאי הצירוף על <code>id</code>. <code>distinct</code> כי אדם עם כמה רכבים יופיע אחרת כמה פעמים. שלוש הצורות שקולות.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 — לכל תאונה, הצג את <b>מספר התאונה</b> (<code>accident_id</code>) ואת <b>יצרן הרכב</b> (<code>brand</code>) שהיה מעורב בה.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select accident.accident_id, car.brand
+from   accident join car on accident.license = car.license</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select accident.accident_id, car.brand
+from   accident, car
+where  accident.license = car.license</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— או צירוף טבעי (עמודה משותפת: <code>license</code>):</p>
+      <pre class="sql">select accident_id, brand
+from   accident natural join car</pre>
+      <p>ל‑<code>accident</code> יש <code>license</code> של הרכב המעורב; מחברים ל‑<code>car</code> כדי לקבל את ה‑<code>brand</code>. כאן בדרך כלל לא צריך <code>distinct</code> — כל שורה היא רכב מסוים בתאונה מסוימת.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 — הצג את <b>שמותיהם של האנשים שמחזיקים רכב מתוצרת <code>'Tesla'</code></b>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select distinct fname, lname
+from   person join owns on person.id = owns.id
+              join car  on owns.license = car.license
+where  car.brand = 'Tesla'</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select distinct person.fname, person.lname
+from   person, owns, car
+where  person.id = owns.id
+  and  owns.license = car.license
+  and  car.brand = 'Tesla'</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— או צירוף טבעי (שרשרת):</p>
+      <pre class="sql">select distinct fname, lname
+from   person natural join owns natural join car
+where  brand = 'Tesla'</pre>
+      <p>שרשרת של שלוש טבלאות (שני תנאי צירוף), ועוד תנאי סינון רגיל על <code>brand</code>. שילוב מושלם של שיעור 1 (סינון) ושיעור 2 (צירוף). שימו לב שתנאי הסינון (<code>brand</code>) נשאר ב‑<code>where</code> גם בצורת ה‑<code>join</code>.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 — הצג את <b>שם המוסך</b> (<code>garage_name</code>) שטיפל בתאונה שמספרה <code>100</code>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select distinct garage.garage_name
+from   accident join garage on accident.garage_id = garage.garage_id
+where  accident.accident_id = 100</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select distinct garage.garage_name
+from   accident, garage
+where  accident.garage_id = garage.garage_id
+  and  accident.accident_id = 100</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— או צירוף טבעי (עמודה משותפת: <code>garage_id</code>):</p>
+      <pre class="sql">select distinct garage_name
+from   accident natural join garage
+where  accident_id = 100</pre>
+      <p>תנאי הצירוף על <code>garage_id</code>, ועוד תנאי סינון על מספר התאונה. (מספר תאונה הוא מספר — בלי גרשיים.)</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. מה תחזיר <code>select * from person, owns</code> <b>בלי</b> פסוק <code>where</code>?</div>
+    <button class="opt" onclick="pick(this,0)">שגיאת תחביר</button>
+    <button class="opt" onclick="pick(this,1)">מכפלה קרטזית — כל שורה ב‑person משולבת עם כל שורה ב‑owns</button>
+    <button class="opt" onclick="pick(this,0)">רק את האנשים שמחזיקים רכב</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. בשרשרת של 3 טבלאות, כמה תנאי צירוף (לפחות) צריך?</div>
+    <button class="opt" onclick="pick(this,0)">3</button>
+    <button class="opt" onclick="pick(this,1)">2</button>
+    <button class="opt" onclick="pick(this,0)">1</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. לאיזה ביטוי באלגברת היחסים שקולה <code>select * from person, owns where person.id = owns.id</code>?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">σ<sub>person.id = owns.id</sub>( person × owns )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">person × owns</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">π<sub>id</sub>( person ) − owns</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. למה צריך לכתוב <code>person.id</code> ולא רק <code>id</code> בצירוף של <code>person</code> ו‑<code>owns</code>?</div>
+    <button class="opt" onclick="pick(this,1)">כי <code>id</code> קיים בשתי הטבלאות — בלי ההבהרה השאילתה דו‑משמעית</button>
+    <button class="opt" onclick="pick(this,0)">כי <code>id</code> היא מילה שמורה ב‑SQL</button>
+    <button class="opt" onclick="pick(this,0)">זה לא נחוץ, תמיד אפשר לכתוב <code>id</code> לבד</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">תקוע בתנאי צירוף? לא בטוח מתי להשתמש ב‑<code>natural join</code>? רוצה שאבדוק שאילתה שכתבת? כתוב לי בצ'אט. אפשר גם לבקש עוד תרגילי צירוף לפני שממשיכים.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 3 — התאמת מחרוזות עם <code>like</code>.</b> בבחינות חוזרת שאלה כמו "מצא לקוחות ששם משפחתם <b>מכיל</b> את הרצף <code>'tov'</code>". נלמד את <code>like</code> ואת התווים <code>%</code> ו‑<code>_</code>. קודם תרגלו צירופים עד שהם זורמים — זה הבסיס לכל מה שבא.
+  </div>
+</section>
+
+<footer>
+  שיעור 2 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (שקופיות 7–8, 14)<br>
+  לפתיחה: <code>open lessons/0002-joins.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

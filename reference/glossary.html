@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מילון מונחים וסכמות — SQL 131112</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{
+    direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.75; font-size:17px;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:40px 22px 80px}
+  header.top{
+    background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:30px;
+    box-shadow:0 10px 30px rgba(43,74,139,.18);
+  }
+  header.top h1{margin:0 0 6px; font-size:30px}
+  header.top p{margin:0; opacity:.92}
+  .ref-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:14px}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:22px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:4px; font-size:23px}
+  h3{color:var(--primary); margin:22px 0 8px; font-size:19px}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15.5px}
+  th,td{border:1px solid var(--line); padding:9px 12px; text-align:right; vertical-align:top}
+  th{background:var(--primary-soft); color:var(--primary); font-weight:700}
+  tr:nth-child(even) td{background:#fafbfe}
+  code, .en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.92em; color:#0f2a5e}
+  td code{display:inline-block}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:10px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:14px 18px; margin:14px 0}
+  .schema-name{display:inline-block; background:var(--accent); color:#fff; padding:2px 12px;
+    border-radius:8px; font-family:ui-monospace,Menlo,monospace; direction:ltr; font-size:15px; margin-bottom:6px}
+  .pk{font-weight:700; text-decoration:underline}
+  .toc a{color:var(--primary); text-decoration:none}
+  .toc li{margin:3px 0}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:30px}
+  @media print{body{background:#fff} section{box-shadow:none; break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="ref-badge">מסמך עזר · Reference</div>
+  <h1>מילון מונחים וסכמות הבחינה</h1>
+  <p>אוצר המילים של בסיסי נתונים ו‑SQL, וארבע הסכמות שמופיעות בבחינות 131112. חזרו לכאן בכל פעם שמונח לא ברור.</p>
+</header>
+
+<section class="toc">
+  <h2>תוכן עניינים</h2>
+  <ul>
+    <li><a href="#read">איך קוראים את המסמך הזה (כיווניות)</a></li>
+    <li><a href="#vocab">1 · אוצר מילים — עברית ↔ אנגלית</a></li>
+    <li><a href="#clauses">2 · מבנה שאילתה ומשמעות כל פסוק</a></li>
+    <li><a href="#operators">3 · אופרטורים ומילים שמורות</a></li>
+    <li><a href="#schemas">4 · ארבע סכמות הבחינה</a></li>
+  </ul>
+</section>
+
+<section id="read">
+  <h2>איך קוראים את המסמך הזה</h2>
+  <p>הטקסט ההסברי בעברית נכתב מימין לשמאל. <strong>כל קטע קוד SQL נכתב באנגלית בלבד ומיושר משמאל לימין</strong> — בדיוק כפי שתכתבו אותו בבחינה. שמות טבלאות ועמודות לעולם אינם מתורגמים לעברית. דוגמה לקוד:</p>
+  <pre class="sql">select fname, lname
+from person
+where city = 'Haifa'</pre>
+  <div class="note">כלל הזהב: עברית = הסבר. אנגלית LTR = שפת המכונה. אם אתם רואים מילה כמו <code>where</code> או <code>group by</code> — היא תמיד באנגלית.</div>
+</section>
+
+<section id="vocab">
+  <h2>1 · אוצר מילים — עברית ↔ אנגלית</h2>
+  <p>המונחים שמופיעים במצגות הקורס ובבחינות. העמודה האנגלית היא המונח שתפגשו בקוד ובשאלות.</p>
+  <table>
+    <tr><th>עברית</th><th>English</th><th>משמעות</th></tr>
+    <tr><td>בסיס נתונים</td><td><code>database</code></td><td>אוסף מאורגן של טבלאות (יחסים).</td></tr>
+    <tr><td>יחס / טבלה</td><td><code>relation / table</code></td><td>טבלה עם שורות ועמודות. במצגות נקראת "יחס".</td></tr>
+    <tr><td>n‑יה / שורה / רשומה</td><td><code>tuple / row</code></td><td>שורה אחת בטבלה.</td></tr>
+    <tr><td>תכונה / שדה / עמודה</td><td><code>attribute / column</code></td><td>עמודה בטבלה.</td></tr>
+    <tr><td>שאילתה</td><td><code>query</code></td><td>בקשה לשליפת מידע מבסיס הנתונים.</td></tr>
+    <tr><td>מפתח ראשי</td><td><code>primary key</code></td><td>עמודה (או צירוף) שמזהה כל שורה ביחידות. מסומן בקו תחתון בסכמה.</td></tr>
+    <tr><td>מפתח זר</td><td><code>foreign key</code></td><td>עמודה שמצביעה על מפתח ראשי בטבלה אחרת (קישור בין טבלאות).</td></tr>
+    <tr><td>פעולת ההטלה</td><td><code>projection</code> (π)</td><td>בחירת עמודות. ב‑SQL זה ה‑<code>select</code>.</td></tr>
+    <tr><td>פעולת הבחירה</td><td><code>selection</code> (σ)</td><td>סינון שורות לפי תנאי. ב‑SQL זה ה‑<code>where</code>.</td></tr>
+    <tr><td>מכפלה קרטזית</td><td><code>Cartesian product</code> (×)</td><td>כל שילוב של שורות משתי טבלאות. ב‑SQL זה ה‑<code>from</code> עם כמה טבלאות.</td></tr>
+    <tr><td>צירוף (טבעי)</td><td><code>(natural) join</code> (⋈)</td><td>חיבור טבלאות לפי עמודות משותפות.</td></tr>
+    <tr><td>צירוף חיצוני</td><td><code>outer join</code></td><td>צירוף ששומר גם שורות בלי התאמה (משלים ב‑<code>null</code>).</td></tr>
+    <tr><td>פונקציית הקבצה</td><td><code>aggregate function</code></td><td><code>count, sum, avg, min, max</code>.</td></tr>
+    <tr><td>הקבצה</td><td><code>group by</code></td><td>קיבוץ שורות לקבוצות לפי ערך משותף.</td></tr>
+    <tr><td>תת‑שאילתה</td><td><code>subquery</code></td><td>שאילתה בתוך שאילתה.</td></tr>
+    <tr><td>ערך דמה / ריק</td><td><code>null</code></td><td>"ערך לא ידוע / לא קיים".</td></tr>
+    <tr><td>אילוץ שלמות</td><td><code>integrity constraint</code></td><td>חוק שהנתונים חייבים לקיים (למשל מפתח, <code>not null</code>, <code>assertion</code>).</td></tr>
+    <tr><td>תצפית</td><td><code>view</code></td><td>טבלה וירטואלית המוגדרת ע"י שאילתה.</td></tr>
+  </table>
+</section>
+
+<section id="clauses">
+  <h2>2 · מבנה שאילתה ומשמעות כל פסוק</h2>
+  <p>שאילתת SQL בסיסית בנויה משלושה פסוקים, ושקולה לביטוי באלגברת היחסים (מצגת פרק 3, שקופית 3):</p>
+  <pre class="sql">select  A1, A2, ... An      -- π  : which columns
+from    r1, r2, ... rm      -- ×  : which tables
+where   condition           -- σ  : which rows</pre>
+  <p style="text-align:center; direction:ltr"><code>&nbsp;&nbsp;π<sub>A1..An</sub> ( σ<sub>condition</sub> ( r1 × r2 × ... × rm ) )&nbsp;</code></p>
+  <table>
+    <tr><th>פסוק</th><th>תפקיד</th><th>הערה</th></tr>
+    <tr><td><code>select</code></td><td>אילו עמודות יוחזרו</td><td><code>select *</code> = כל העמודות. <code>distinct</code> מסיר כפילויות.</td></tr>
+    <tr><td><code>from</code></td><td>מאילו טבלאות</td><td>כמה טבלאות מופרדות בפסיק = מכפלה קרטזית.</td></tr>
+    <tr><td><code>where</code></td><td>אילו שורות (תנאי סינון)</td><td>השמטתו = כל השורות.</td></tr>
+    <tr><td><code>group by</code></td><td>קיבוץ לקבוצות</td><td>פונקציות הקבצה פועלות על כל קבוצה.</td></tr>
+    <tr><td><code>having</code></td><td>תנאי על קבוצות</td><td>כמו <code>where</code>, אבל אחרי ההקבצה.</td></tr>
+    <tr><td><code>order by</code></td><td>מיון התוצאה</td><td><code>asc</code> עולה (ברירת מחדל) / <code>desc</code> יורד.</td></tr>
+  </table>
+  <div class="note">סדר ביצוע לוגי: <code>from</code> → <code>where</code> → <code>group by</code> → <code>having</code> → <code>select</code> → <code>order by</code>.</div>
+</section>
+
+<section id="operators">
+  <h2>3 · אופרטורים ומילים שמורות</h2>
+  <table>
+    <tr><th>קטגוריה</th><th>אנגלית</th><th>משמעות</th></tr>
+    <tr><td>לוגי</td><td><code>and</code> · <code>or</code> · <code>not</code></td><td>במקום ∧ ∨ ¬.</td></tr>
+    <tr><td>השוואה</td><td><code>=</code> <code>&lt;&gt;</code> <code>&lt;</code> <code>&gt;</code> <code>&lt;=</code> <code>&gt;=</code></td><td><code>&lt;&gt;</code> = "לא שווה".</td></tr>
+    <tr><td>טווח</td><td><code>between ... and ...</code></td><td>בתוך תחום ערכים.</td></tr>
+    <tr><td>התאמת מחרוזת</td><td><code>like '%ha%'</code></td><td><code>%</code> = כל רצף תווים, <code>_</code> = תו בודד.</td></tr>
+    <tr><td>שייכות לקבוצה</td><td><code>in</code> · <code>not in</code></td><td>האם ערך נמצא בקבוצה (לרוב מתת‑שאילתה).</td></tr>
+    <tr><td>קיום</td><td><code>exists</code> · <code>not exists</code></td><td>האם תת‑השאילתה מחזירה לפחות שורה אחת.</td></tr>
+    <tr><td>השוואה לקבוצה</td><td><code>&gt; some</code> · <code>&gt;= all</code> ...</td><td>השוואה מול אחד / כל איברי קבוצה.</td></tr>
+    <tr><td>הכלה</td><td><code>contains</code></td><td>האם קבוצה אחת מכילה אחרת (חלוקה / "לכל").</td></tr>
+    <tr><td>קבוצות</td><td><code>union</code> · <code>intersect</code> · <code>minus</code></td><td>איחוד ∪, חיתוך ∩, הפרש −.</td></tr>
+    <tr><td>בדיקת ריק</td><td><code>is null</code> · <code>is not null</code></td><td>אסור להשתמש ב‑<code>= null</code>!</td></tr>
+  </table>
+</section>
+
+<section id="schemas">
+  <h2>4 · ארבע סכמות הבחינה</h2>
+  <p>מפתח ראשי <span class="pk">בקו תחתון</span>. אלו הסכמות שחוזרות בבחינות — שווה להכיר אותן בעל פה.</p>
+
+  <h3>א · בנק (מופיעה במצגות הקורס)</h3>
+  <span class="schema-name">branch · customer · deposit · borrow</span>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th><th>תיאור</th></tr>
+    <tr><td><code>branch</code></td><td><span class="pk en">branch-name</span>, <code>branch-city</code>, <code>assets</code></td><td>סניפים.</td></tr>
+    <tr><td><code>customer</code></td><td><span class="pk en">customer-name</span>, <code>street</code>, <code>customer-city</code></td><td>לקוחות.</td></tr>
+    <tr><td><code>deposit</code></td><td><span class="pk en">account-number, customer-name</span>, <code>branch-name</code>, <code>balance</code></td><td>חשבונות חיסכון.</td></tr>
+    <tr><td><code>borrow</code></td><td><span class="pk en">loan-number, customer-name</span>, <code>branch-name</code>, <code>amount</code></td><td>הלוואות.</td></tr>
+  </table>
+
+  <h3>ב · חברת ביטוח רכב (הסכמה הנפוצה ביותר בבחינות)</h3>
+  <span class="schema-name">person · owns · car · accident · garage</span>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th><th>תיאור</th></tr>
+    <tr><td><code>person</code></td><td><span class="pk en">id</span>, <code>fname</code>, <code>lname</code>, <code>street</code>, <code>city</code>, <code>birth</code></td><td>אנשים/לקוחות. <code>id</code> = ת"ז.</td></tr>
+    <tr><td><code>owns</code></td><td><span class="pk en">id, license</span></td><td>בעלוּת: אדם <code>id</code> מחזיק רכב <code>license</code>.</td></tr>
+    <tr><td><code>car</code></td><td><span class="pk en">license</span>, <code>model</code>, <code>brand</code>, <code>year</code></td><td>רכבים. <code>brand</code> = יצרן, <code>year</code> = שנת ייצור.</td></tr>
+    <tr><td><code>accident</code></td><td><span class="pk en">accident_id, license</span>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td><td>תאונות. <code>driver_id</code> = הנהג (לאו דווקא הבעלים), <code>damage</code> = עלות נזק.</td></tr>
+    <tr><td><code>garage</code></td><td><span class="pk en">garage_id</span>, <code>garage_name</code>, <code>street</code>, <code>city</code></td><td>מוסכים.</td></tr>
+  </table>
+  <div class="note">מפתחות זרים: <code>owns.id→person</code>, <code>owns.license→car</code>, <code>accident.license→car</code>, <code>accident.driver_id→person</code>, <code>accident.garage_id→garage</code>.</div>
+
+  <h3>ג · ספרייה</h3>
+  <span class="schema-name">Books · Authors · Borrowers · Loans · Genres · Book_Genres</span>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th><th>תיאור</th></tr>
+    <tr><td><code>Books</code></td><td><span class="pk en">isbn</span>, <code>title</code>, <code>publ_year</code>, <code>pages</code>, <code>author_id</code>, <code>num_copies</code></td><td>ספרים.</td></tr>
+    <tr><td><code>Authors</code></td><td><span class="pk en">author_id</span>, <code>name</code>, <code>birth_year</code></td><td>סופרים.</td></tr>
+    <tr><td><code>Borrowers</code></td><td><span class="pk en">borrower_id</span>, <code>name</code>, <code>phone_number</code>, <code>address</code></td><td>שואלים.</td></tr>
+    <tr><td><code>Loans</code></td><td><span class="pk en">loan_id</span>, <code>book_isbn</code>, <code>borrower_id</code>, <code>loan_date</code>, <code>return_date</code></td><td>השאלות. <code>return_date</code> ריק = טרם הוחזר.</td></tr>
+    <tr><td><code>Genres</code></td><td><span class="pk en">genre_id</span>, <code>genre_name</code></td><td>ז'אנרים.</td></tr>
+    <tr><td><code>Book_Genres</code></td><td><span class="pk en">isbn, genre_id</span></td><td>קישור ספר↔ז'אנר.</td></tr>
+  </table>
+
+  <h3>ד · אפיפיורים</h3>
+  <span class="schema-name">Papacy · Info</span>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th><th>תיאור</th></tr>
+    <tr><td><code>Papacy</code></td><td><span class="pk en">title, number</span>, <code>start</code>, <code>end</code></td><td>תקופות כהונה. <code>end</code> ריק = מכהן כעת.</td></tr>
+    <tr><td><code>Info</code></td><td><span class="pk en">title, number</span>, <code>fname</code>, <code>lname</code>, <code>birth</code>, <code>death</code></td><td>פרטים אישיים. <code>death</code> ריק = בחיים.</td></tr>
+  </table>
+</section>
+
+<footer>
+  מסמך עזר · קורס מערכות בסיסי נתונים 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> ו‑<code>src/בקרת שלמות הנתונים.pdf</code><br>
+  יש שאלה על מונח? פנו אליי (המורה) ואסביר.
+</footer>
+
+</div>
+<script>
+(function(){
+  var kw=['select','distinct','from','where','and','or','not','in','as','join','inner','left','right','full','outer','on','using','natural','group','by','having','order','asc','desc','union','intersect','minus','except','exists','some','any','all','contains','between','like','is','null','insert','into','values','delete','update','set','create','table','view','assertion','check','primary','key','foreign','references','count','sum','avg','min','max'];
+  document.querySelectorAll('pre.sql').forEach(function(el){
+    var raw=el.textContent;
+    raw=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    raw=raw.replace(/('[^']*')|(--[^\n]*)|([A-Za-z_][A-Za-z0-9_]*)/g,function(m,str,cmt,word){
+      if(str)return '<span class="str">'+str+'</span>';
+      if(cmt)return '<span class="cmt">'+cmt+'</span>';
+      if(word&&kw.indexOf(word.toLowerCase())>-1)return '<span class="kw">'+word+'</span>';
+      return m;
+    });
+    el.innerHTML=raw;
+  });
+})();
+</script>
+</body>
+</html>

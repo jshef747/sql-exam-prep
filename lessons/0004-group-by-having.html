@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 4 · הקבצה — group by · having</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.bad{border-right-color:var(--danger); background:#fdf3f1}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:5px 12px; font-weight:700; font-family:ui-monospace,Menlo,monospace; font-size:14px}
+  .flow .ar{color:var(--muted)}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 4 · הקבצה וסיכום</div>
+  <h1>group by · having · פונקציות הקבצה</h1>
+  <p>איך עונים על "כמה?", "ממוצע?", "לכל יצרן / לכל סניף / לכל קבוצה". זהו המנוע שמאחורי חלק גדול משאלות חלק ב' בבחינה.</p>
+  <div class="goal">🎯 <b>היעד:</b> לחשב ערך מסכם (ספירה, ממוצע, סכום...) — גם על כל הטבלה, וגם <b>לכל קבוצה בנפרד</b> — ולסנן קבוצות לפי התוצאה.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה:</b> שליפה (1), צירוף (2), התאמת מחרוזות (3). כל אלו החזירו <b>שורות</b>. עכשיו נלמד להחזיר <b>סיכומים</b> מעל שורות.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>city</code>, …</td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html">מילון המונחים והסכמות ←</a></p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>פונקציות הקבצה על כל הטבלה</h2>
+  <p>פונקציית הקבצה לוקחת עמודה שלמה ומחזירה <b>ערך בודד</b> (מצגת פרק 3, שקופית 25):</p>
+  <table>
+    <tr><th>פונקציה</th><th>מה מחשבת</th></tr>
+    <tr><td><code>count(*)</code></td><td>מספר השורות</td></tr>
+    <tr><td><code>count(x)</code></td><td>מספר הערכים (שאינם <code>null</code>) בעמודה <code>x</code></td></tr>
+    <tr><td><code>count(distinct x)</code></td><td>מספר הערכים ה<b>שונים</b> בעמודה <code>x</code></td></tr>
+    <tr><td><code>sum(x)</code></td><td>סכום</td></tr>
+    <tr><td><code>avg(x)</code></td><td>ממוצע</td></tr>
+    <tr><td><code>min(x)</code> · <code>max(x)</code></td><td>מינימום · מקסימום</td></tr>
+  </table>
+  <pre class="sql">select count(*)
+from   accident          -- מספר התאונות הכולל</pre>
+  <pre class="sql">select avg(damage)
+from   accident          -- הנזק הממוצע על פני כל התאונות</pre>
+  <div class="note">💡 <code>count(*)</code> סופר שורות. <code>count(distinct driver_id)</code> סופר כמה נהגים <b>שונים</b> מופיעים. ההבדל קריטי בבחינה — שימו לב אם נשאלתם "כמה" או "כמה <b>שונים</b>".</div>
+</section>
+
+<section>
+  <h2><span class="step">2</span><code>group by</code> — סיכום לכל קבוצה</h2>
+  <p>בלי <code>group by</code> מקבלים שורת סיכום אחת לכל הטבלה. עם <code>group by</code> מחלקים את השורות לקבוצות לפי ערך משותף, והפונקציה מחושבת <b>לכל קבוצה בנפרד</b> (מצגת פרק 3, שקופית 26):</p>
+  <pre class="sql">select brand, count(*)
+from   car
+group by brand           -- שורה אחת לכל יצרן, עם מספר הרכבים שלו</pre>
+  <p>המנגנון: כל הרכבים מאותו <code>brand</code> נכנסים לאותה קבוצה, ו‑<code>count(*)</code> סופר כל קבוצה.</p>
+
+  <h3>הכלל החשוב ביותר ב‑<code>group by</code></h3>
+  <p>כל עמודה ב‑<code>select</code> חייבת להיות <b>או</b> בתוך <code>group by</code> <b>או</b> בתוך פונקציית הקבצה. אסור לערבב עמודה "חופשית" עם הקבצה:</p>
+  <pre class="sql bad">select brand, model, count(*)   -- ❌ אסור! model לא ב-group by ולא בתוך פונקציה
+from   car
+group by brand</pre>
+  <pre class="sql">select brand, count(*)           -- ✓ תקין
+from   car
+group by brand</pre>
+</section>
+
+<section>
+  <h2><span class="step">3</span><code>group by</code> אחרי צירוף</h2>
+  <div class="exam">🎓 <b>בסגנון בחינה (שאלה 6.4):</b> "לכל יצרן רכב, מצא את מספר התאונות שבהן היו מעורבות מכוניות של יצרן זה."</div>
+  <p>היצרן ב‑<code>car</code>, התאונות ב‑<code>accident</code> — קודם מצרפים, אחר כך מקבצים:</p>
+  <pre class="sql">select car.brand, count(*)
+from   accident join car on accident.license = car.license
+group by car.brand</pre>
+  <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+  <pre class="sql">select car.brand, count(*)
+from   accident, car
+where  accident.license = car.license
+group by car.brand</pre>
+  <p>סדר המחשבה: (1) צרף תאונות לרכבים, (2) קבץ לפי יצרן, (3) ספור כל קבוצה.</p>
+  <div class="note">📌 הערה: השאלה המקורית מבקשת גם יצרנים עם <b>0</b> תאונות וגם מיון — זה דורש <code>outer join</code> ו‑<code>order by</code>, שנלמד בשיעור נפרד. כאן התמקדנו בלב העניין: הקבצה אחרי צירוף.</p></div>
+</section>
+
+<section>
+  <h2><span class="step">4</span><code>having</code> — סינון קבוצות</h2>
+  <p><code>where</code> מסנן <b>שורות</b>. <code>having</code> מסנן <b>קבוצות</b> — לפי תוצאת פונקציית הקבצה (מצגת פרק 3, שקופית 27):</p>
+  <pre class="sql">select brand, count(*)
+from   car
+group by brand
+having count(*) &gt; 10      -- רק יצרנים עם יותר מ-10 רכבים</pre>
+  <div class="warn">⚠️ אי אפשר לשים פונקציית הקבצה ב‑<code>where</code>. <code>where count(*) &gt; 10</code> שגוי! תנאי על תוצאת הקבצה הולך תמיד ב‑<code>having</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">5</span><code>where</code> מול <code>having</code> — סדר הביצוע</h2>
+  <p>זו נקודה שהבחינה אוהבת (מצגת פרק 3, שקופיות 28–29). סדר הביצוע הלוגי:</p>
+  <div class="flow">
+    <span class="t">from</span><span class="ar">→</span>
+    <span class="t">where</span><span class="ar">→</span>
+    <span class="t">group by</span><span class="ar">→</span>
+    <span class="t">having</span><span class="ar">→</span>
+    <span class="t">select</span>
+  </div>
+  <p><code>where</code> מסנן שורות <b>לפני</b> ההקבצה; <code>having</code> מסנן קבוצות <b>אחרי</b>. דוגמה שמשלבת את שניהם — "לכל יצרן, מספר הרכבים <b>משנת 2020 ואילך</b>, רק עבור יצרנים עם יותר מ‑3 רכבים כאלה":</p>
+  <pre class="sql">select brand, count(*)
+from   car
+where  year &gt;= 2020       -- (1) קודם מסננים שורות
+group by brand            -- (2) מקבצים לפי יצרן
+having count(*) &gt; 3       -- (3) ואז מסננים קבוצות</pre>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". (מצב העריכה נבחר בפינה השמאלית העליונה.)</p>
+
+  <div class="ex">
+    <div class="task">תרגיל 1 — כמה אנשים יש בסך הכול בטבלת <code>person</code>?</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select count(*)
+from   person</pre>
+      <p><code>count(*)</code> סופר את כל השורות בטבלה.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 — כמה נהגים <b>שונים</b> (<code>driver_id</code>) מופיעים בטבלת התאונות?</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select count(distinct driver_id)
+from   accident</pre>
+      <p>"שונים" ⟵ <code>count(distinct ...)</code>. בלי <code>distinct</code> היינו סופרים נהג שהיה במספר תאונות כמה פעמים.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 — לכל יצרן (<code>brand</code>), הצג את מספר הרכבים שלו.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select brand, count(*)
+from   car
+group by brand</pre>
+      <p>קיבוץ לפי <code>brand</code>; <code>count(*)</code> מחושב לכל קבוצה.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 — לכל יצרן, הצג את מספר התאונות שבהן היו מעורבים רכבים שלו (צירוף + הקבצה).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select car.brand, count(*)
+from   accident join car on accident.license = car.license
+group by car.brand</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select car.brand, count(*)
+from   accident, car
+where  accident.license = car.license
+group by car.brand</pre>
+      <p>קודם צירוף (<code>accident</code>↔<code>car</code>), אחר כך הקבצה לפי <code>brand</code>. זה לב שאלה 6.4.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 5 — הצג את היצרנים שיש להם <b>יותר מ‑5 רכבים</b>, ואת מספר הרכבים של כל אחד.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select brand, count(*)
+from   car
+group by brand
+having count(*) &gt; 5</pre>
+      <p>תנאי על תוצאת ההקבצה ⟵ <code>having</code> (לא <code>where</code>!).</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. איזה פסוק מסנן <b>קבוצות</b> (לפי תוצאת פונקציית הקבצה)?</div>
+    <button class="opt" onclick="pick(this,0)"><code>where</code></button>
+    <button class="opt" onclick="pick(this,1)"><code>having</code></button>
+    <button class="opt" onclick="pick(this,0)"><code>group by</code></button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. מה ההבדל בין <code>count(*)</code> ל‑<code>count(distinct driver_id)</code>?</div>
+    <button class="opt" onclick="pick(this,0)">אין הבדל</button>
+    <button class="opt" onclick="pick(this,1)">הראשון סופר שורות; השני סופר כמה ערכי <code>driver_id</code> שונים יש</button>
+    <button class="opt" onclick="pick(this,0)">הראשון סופר רק שורות עם <code>null</code></button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. איזו שאילתה <b>אסורה</b>?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">select brand, model, count(*) from car group by brand</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select brand, count(*) from car group by brand</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select count(*) from car</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. מהו סדר הביצוע הלוגי הנכון?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">from → where → group by → having → select</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">from → having → group by → where → select</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select → where → group by → having → from</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">מתבלבל מתי <code>where</code> ומתי <code>having</code>? רוצה לראות מה קורה ל‑<code>null</code> בתוך <code>avg</code> ו‑<code>count</code>? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 5 — שאלות "הכי": MAX/MIN ("היצרן עם הכי הרבה", "התאונה עם הנזק הממוצע הגבוה ביותר").</b> נחבר את ההקבצה של היום עם הטכניקות למציאת המקסימום — בדיוק שאלות 6.3 ו‑6.5 מהבחינה.
+  </div>
+</section>
+
+<footer>
+  שיעור 4 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (שקופיות 25–30) ושאלה 6.4 מהבחינות<br>
+  לפתיחה: <code>open lessons/0004-group-by-having.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>
