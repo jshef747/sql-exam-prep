@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 7 · תת‑שאילתות — in · not in · exists · some · all</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.bad{border-right-color:var(--danger); background:#fdf3f1}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:5px 12px; font-weight:700; font-family:ui-monospace,Menlo,monospace; font-size:14px}
+  .flow .ar{color:var(--muted)}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 7 · תת‑שאילתות</div>
+  <h1>תת‑שאילתות · in · not in · exists · not exists · some · all</h1>
+  <p>שאילתה בתוך שאילתה. איך עונים על "אנשים שיש להם רכב טסלה", "רכבים שמעולם לא היו בתאונה", "סופרים שיש להם ספר מדע" — סינון לפי <b>שייכוּת לקבוצה</b> שמחזירה שאילתה אחרת, או לפי <b>האם קבוצה קשורה ריקה</b>.</p>
+  <div class="goal">🎯 <b>היעד:</b> לדעת לסנן שורה לפי תוצאת שאילתה פנימית — האם ערך נמצא בקבוצה (<code>in</code>/<code>not in</code>), האם קיימת שורה קשורה (<code>exists</code>/<code>not exists</code>), והשוואה מול קבוצה (<code>some</code>/<code>all</code>).</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה:</b> שליפה (1), צירוף (2), <code>like</code> (3), הקבצה (4), MAX/MIN (5), צירוף חיצוני ומיון (6). בשיעור 5 כבר פגשנו תת‑שאילתה אחת (<code>= (select max ...)</code>) ו‑<code>&gt;= all</code>. היום זה הופך לכלי המרכזי.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>city</code>, …</td></tr>
+    <tr><td><code>owns</code></td><td><u><code>id</code>, <code>license</code></u></td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html#schemas">מילון המונחים והסכמות ←</a>. בהמשך נשתמש גם בסכמת הספרייה (<a href="../reference/glossary.html#schemas">ג'</a>).</p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>מה זאת תת‑שאילתה?</h2>
+  <p><b>תת‑שאילתה</b> (subquery) היא שאילתת <code>select</code> שיושבת בתוך שאילתה אחרת, בתוך סוגריים. השאילתה הפנימית מחזירה <b>קבוצת ערכים</b> (או שורות), והשאילתה החיצונית משתמשת בה כדי לסנן. שני סוגי שאלות עיקריים פותרים כך:</p>
+  <ul style="margin:0">
+    <li><b>שייכוּת לקבוצה</b> — "האם הערך הזה נמצא בקבוצה שהחזירה השאילתה הפנימית?" ⟵ <code>in</code> / <code>not in</code>.</li>
+    <li><b>קיוּם</b> — "האם השאילתה הפנימית מחזירה ולו שורה אחת?" ⟵ <code>exists</code> / <code>not exists</code>.</li>
+  </ul>
+  <p>בשיעור 5 כבר השתמשנו בתת‑שאילתה שמחזירה <b>ערך בודד</b> (<code>= (select max(year) from car)</code>). היום השאילתה הפנימית תחזיר <b>קבוצה שלמה</b> של ערכים.</p>
+  <div class="flow">
+    <span class="t">in / not in</span><span class="ar">·</span>
+    <span class="t">exists / not exists</span><span class="ar">·</span>
+    <span class="t">&gt; some · &gt; all</span>
+  </div>
+</section>
+
+<section>
+  <h2><span class="step">2</span><code>in</code> / <code>not in</code> — שייכוּת לקבוצה</h2>
+  <p>הצורה: <code>value in (subquery)</code> נכון אם <code>value</code> מופיע בקבוצה שהשאילתה הפנימית מחזירה. דוגמה — "מצא את האנשים שבבעלותם רכב <b>טסלה</b>". קודם נבנה את הקבוצה של ת"ז כל בעלי טסלה, ואז נבדוק מי מהאנשים שייך אליה:</p>
+  <pre class="sql">select fname, lname
+from   person
+where  id in (select id
+              from   owns join car on owns.license = car.license
+              where  brand = 'Tesla')</pre>
+  <p>הפנימית מחזירה את ה‑<code>id</code> של כל מי שמחזיק טסלה; החיצונית שולפת רק אנשים שה‑<code>id</code> שלהם בקבוצה הזו.</p>
+
+  <h3>ההיפך — <code>not in</code></h3>
+  <p>"רכבים ש<b>מעולם לא</b> היו בתאונה" = רכבים שה‑<code>license</code> שלהם <b>לא</b> מופיע בטבלת התאונות:</p>
+  <pre class="sql">select license, model, brand
+from   car
+where  license not in (select license from accident)</pre>
+  <p>קוראים: "החזר רכב שה‑<code>license</code> שלו אינו בקבוצת כל ה‑<code>license</code> שיש להם תאונה".</p>
+  <div class="note">💡 שווה לדעת: כמעט כל <code>in (subquery)</code> אפשר גם לכתוב כצירוף. כאן "בעלי טסלה" אפשר גם <code>person join owns ... where brand='Tesla'</code>. ה‑<code>in</code> נוח כשרוצים להחזיר שורות מטבלה אחת בלבד ולסנן לפי שייכוּת — בלי לגרור עמודות מהטבלה השנייה ובלי כפילויות מהצירוף.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span><code>exists</code> / <code>not exists</code> — האם קיימת שורה קשורה?</h2>
+  <p><code>exists (subquery)</code> מחזיר אמת אם השאילתה הפנימית מחזירה <b>לפחות שורה אחת</b>, ושקר אם היא מחזירה <b>אפס שורות</b>. לא חשוב <i>מה</i> היא מחזירה — רק <b>אם</b> יש בה משהו. לכן נהוג לכתוב בה <code>select *</code>.</p>
+  <p>הכוח האמיתי הוא ב<b>תת‑שאילתה מתואמת</b> (correlated): הפנימית <b>מתייחסת לשורה של החיצונית</b>. דוגמה — "אנשים שבבעלותם רכב טסלה", הפעם עם <code>exists</code>:</p>
+  <pre class="sql">select fname, lname
+from   person p
+where  exists (select *
+               from   owns o join car c on o.license = c.license
+               where  o.id = p.id            -- &lt;-- correlation to the outer row
+                 and  c.brand = 'Tesla')</pre>
+  <p>שימו לב לשורה <code>o.id = p.id</code>: הפנימית "מסתכלת" על האדם <code>p</code> הנוכחי מהחיצונית, ובודקת אם יש לו ולו רכב טסלה אחד. אם כן — השורה נשמרת. זו <b>ההתאמה</b> (correlation) — בלעדיה <code>exists</code> מאבד את כל הכוח.</p>
+
+  <h3>מתי <i>חובה</i> תת‑שאילתה מתואמת?</h3>
+  <p>כשהתנאי הפנימי תלוי בשורה החיצונית. למשל "יש לו רכב טסלה" מתואם דרך <code>o.id = p.id</code>. לעומת זאת ב‑<code>in</code> של שלב 2 הקבוצה הפנימית קבועה (כל בעלי טסלה) ולא תלויה באדם הספציפי — שם אין צורך בהתאמה.</p>
+
+  <h3>ההיפך — <code>not exists</code> ("אין לו אף אחד")</h3>
+  <p>"רכבים שמעולם לא היו בתאונה" = רכבים שלגביהם <b>לא קיימת</b> תאונה. זו אותה שאלה משלב 2, הפעם עם <code>not exists</code> מתואם:</p>
+  <pre class="sql">select license, model, brand
+from   car c
+where  not exists (select *
+                   from   accident a
+                   where  a.license = c.license)</pre>
+  <p>קוראים: "החזר רכב <code>c</code> שלגביו <b>לא קיימת</b> שורת תאונה <code>a</code> עם אותו <code>license</code>". זה ה‑workhorse לכל שאלת "ש<b>מעולם לא</b> / ש<b>אין</b> לו…".</p>
+  <table>
+    <tr><th>בעברית</th><th>תבנית</th></tr>
+    <tr><td>"יש לו לפחות אחד…"</td><td><code>exists (...מתואם...)</code></td></tr>
+    <tr><td>"אין לו אף אחד…" / "מעולם לא…"</td><td><code>not exists (...מתואם...)</code></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="step">4</span><code>not in</code> מול <code>not exists</code> — מלכודת הבחינה ו‑<code>null</code></h2>
+  <p>לרוב <code>not in</code> ו‑<code>not exists</code> מחזירים את אותה תוצאה. אבל יש מלכודת אחת ש<b>הבחינה אוהבת</b>: אם בקבוצה של <code>not in</code> יש ערך <code>null</code> — התוצאה מתקלקלת.</p>
+  <p>הסיבה: ב‑SQL השוואה ל‑<code>null</code> אינה "אמת" ואינה "שקר" אלא <b>unknown</b>. ב‑<code>x not in (a, b, null)</code> זה הופך ל‑"<code>x≠a</code> וגם <code>x≠b</code> וגם <code>x≠null</code>", והחלק האחרון תמיד <code>unknown</code> — מה שגורם לתנאי כולו <b>לעולם לא להחזיר אמת</b>. התוצאה: שורות שהיו צריכות לחזור — נעלמות, והשאילתה מחזירה (בטעות) קבוצה ריקה.</p>
+  <pre class="sql bad">-- if driver_id can be null, this is dangerous:
+select fname, lname
+from   person
+where  id not in (select driver_id from accident)   -- &lt;-- null in the set =&gt; empty result!</pre>
+  <p>הגרסה עם <code>not exists</code> חסינה ל‑<code>null</code> — היא בודקת קיוּם שורה, לא שוויון מול קבוצה:</p>
+  <pre class="sql">select fname, lname
+from   person p
+where  not exists (select *
+                   from   accident a
+                   where  a.driver_id = p.id)</pre>
+  <div class="warn">⚠️ <b>כלל אצבע לבחינה:</b> כשאתם כותבים "ש<b>מעולם לא</b> / ש<b>אין</b>", העדיפו <code>not exists</code> על <code>not in</code> — הוא נכון תמיד, גם כשיש <code>null</code> בעמודה. <code>not in</code> בטוח רק כשהעמודה הפנימית מוגדרת <code>not null</code> (למשל מפתח ראשי).</div>
+</section>
+
+<section>
+  <h2><span class="step">5</span><code>some</code> (=<code>any</code>) ו‑<code>all</code> — השוואה מול קבוצה</h2>
+  <p>אלו אופרטורים שמשווים ערך בודד מול <b>כל</b> הערכים בקבוצה (מצגת תיאור שפת SQL, פרק תת‑שאילתות):</p>
+  <table>
+    <tr><th>צורה</th><th>נכון אם…</th></tr>
+    <tr><td><code>x &gt; some (...)</code></td><td><code>x</code> גדול מ<b>לפחות אחד</b> מערכי הקבוצה (כלומר גדול מהמינימום).</td></tr>
+    <tr><td><code>x &gt; all (...)</code></td><td><code>x</code> גדול מ<b>כל</b> ערכי הקבוצה (כלומר גדול מהמקסימום).</td></tr>
+  </table>
+  <p><code>some</code> ו‑<code>any</code> הם מילים נרדפות — אותה משמעות בדיוק. דוגמה — "רכבים חדשים יותר <b>מכל</b> רכבי הונדה":</p>
+  <pre class="sql">select model, brand, year
+from   car
+where  year &gt; all (select year from car where brand = 'Honda')</pre>
+  <p>ולעומת זאת "חדש יותר מ<b>לפחות אחד</b> מרכבי הטסלה" (כלומר לא הכי ישן בין הטסלות):</p>
+  <pre class="sql">select model, brand, year
+from   car
+where  year &gt; some (select year from car where brand = 'Tesla')</pre>
+
+  <h3>הקשר לשיעור 5: <code>&gt;= all</code> זה MAX</h3>
+  <p>בשיעור 5 ראינו שהמקסימום הוא <code>&gt;= all</code>: "הרכב החדש ביותר" = <code>year &gt;= all (select year from car)</code>. זה בדיוק אותו <code>all</code> מכאן — מקרה פרטי שבו משווים מול <b>כל</b> הטבלה. וגם: <code>= some (...)</code> שקול בדיוק ל‑<code>in (...)</code>, ו‑<code>&lt;&gt; all (...)</code> שקול ל‑<code>not in (...)</code>.</p>
+  <div class="note">💡 סיכום שקילויות: <code>= some</code> ⟷ <code>in</code> · <code>&lt;&gt; all</code> ⟷ <code>not in</code> · <code>&gt;= all</code> ⟷ "הכי גדול (MAX)" · <code>&lt;= all</code> ⟷ "הכי קטן (MIN)".</div>
+</section>
+
+<section>
+  <h2><span class="step">6</span>טריק האלגברה היחסית: "הכי גדול" בלי <code>max</code></h2>
+  <p>נזכיר רעיון משיעור 5 בלבוש של תת‑שאילתה: ערך הוא ה<b>מקסימלי</b> בדיוק אם <b>לא קיים</b> ערך גדול ממנו. זה בדיוק תרגום של חיסור באלגברה היחסית (<code>−</code>) ל‑SQL. "הנזק הגבוה ביותר" =</p>
+  <pre class="sql">select damage
+from   accident a1
+where  not exists (select *
+                   from   accident a2
+                   where  a2.damage &gt; a1.damage)</pre>
+  <p>או באותו רעיון עם <code>not in</code> מול הקבוצה של "כל נזק שיש מעליו נזק גדול יותר":</p>
+  <pre class="sql">select damage
+from   accident
+where  damage not in (select a1.damage
+                      from   accident a1, accident a2
+                      where  a2.damage &gt; a1.damage)</pre>
+  <p>בדיוק את התבנית הזו נפגוש בשאלת המבחן בהמשך — שם מבקשים לתרגם ביטוי באלגברה יחסית (חיסור + צירוף‑עצמי) לשאילתת ה‑SQL השקולה.</p>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלה שבמבחנים.</p>
+
+  <h3>חימום ותרגול</h3>
+  <div class="ex">
+    <div class="task">תרגיל 1 (<code>in</code>) — הצג שם פרטי ומשפחה של כל האנשים שבבעלותם רכב <b>טסלה</b> (<code>brand = 'Tesla'</code>).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select fname, lname
+from   person
+where  id in (select id
+              from   owns join car on owns.license = car.license
+              where  brand = 'Tesla')</pre>
+      <p>בונים קבוצת ת"ז של בעלי טסלה בתת‑שאילתה, ובודקים מי שייך אליה עם <code>in</code>.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 (<code>not in</code>) — הצג <code>license</code>, <code>model</code>, <code>brand</code> של כל הרכבים ש<b>מעולם לא</b> היו מעורבים בתאונה.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select license, model, brand
+from   car
+where  license not in (select license from accident)</pre>
+      <p>"מעולם לא" ⟵ <code>not in</code>. כאן זה בטוח כי <code>accident.license</code> הוא חלק ממפתח ראשי ולכן לעולם לא <code>null</code>.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 (<code>exists</code> מתואם) — הצג שם פרטי ומשפחה של אנשים שיש להם <b>לפחות רכב טסלה אחד</b>, הפעם בעזרת <code>exists</code> (תת‑שאילתה מתואמת).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select fname, lname
+from   person p
+where  exists (select *
+               from   owns o join car c on o.license = c.license
+               where  o.id = p.id
+                 and  c.brand = 'Tesla')</pre>
+      <p>ההתאמה <code>o.id = p.id</code> מקשרת את הפנימית לאדם הנוכחי. אותה תשובה כמו תרגיל 1, בדרך אחרת.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 (<code>not exists</code>) — הצג <code>license</code>, <code>model</code>, <code>brand</code> של רכבים שמעולם לא היו בתאונה, הפעם בעזרת <code>not exists</code> מתואם (זו הדרך המומלצת בבחינה).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select license, model, brand
+from   car c
+where  not exists (select *
+                   from   accident a
+                   where  a.license = c.license)</pre>
+      <p>"אין לגביו אף תאונה" ⟵ <code>not exists</code> מתואם. תוצאה זהה לתרגיל 2, אך חסינה ל‑<code>null</code>.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 5 (<code>&gt; all</code>) — הצג <code>model</code>, <code>brand</code>, <code>year</code> של כל הרכבים שחדשים יותר (<code>year</code> גדול) מ<b>כל</b> רכבי <b>הונדה</b> (<code>Honda</code>).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select model, brand, year
+from   car
+where  year &gt; all (select year from car where brand = 'Honda')</pre>
+      <p>"חדש מכל הונדה" = <code>year</code> גדול מהמקסימום של שנות ההונדה ⟵ <code>&gt; all</code>.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 6 (ספרייה, <code>exists</code> מתואם) — הצג את שמות הסופרים (<code>name</code>) שיש להם <b>לפחות ספר אחד</b> בז'אנר <code>Science</code>.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Authors(author_id, name)</code> · <code>Books(isbn, author_id, …)</code> · <code>Book_Genres(isbn, genre_id)</code> · <code>Genres(genre_id, genre_name)</code></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select name
+from   Authors au
+where  exists (select *
+               from   Books b
+                      join Book_Genres bg on b.isbn = bg.isbn
+                      join Genres g       on bg.genre_id = g.genre_id
+               where  b.author_id = au.author_id
+                 and  g.genre_name = 'Science')</pre>
+      <p>ההתאמה <code>b.author_id = au.author_id</code> מקשרת את הפנימית לסופר הנוכחי; <code>exists</code> = "יש לו לפחות ספר מדע אחד".</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 7 (ספרייה, <code>not exists</code>) — הצג את כותרות הספרים (<code>title</code>) ש<b>מעולם לא הושאלו</b> (אין להם אף שורה ב‑<code>Loans</code>).</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Books(isbn, title, …)</code> · <code>Loans(loan_id, book_isbn, …)</code></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select title
+from   Books b
+where  not exists (select *
+                   from   Loans l
+                   where  l.book_isbn = b.isbn)</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם <code>not in</code> (בטוח כאן כי <code>book_isbn</code> אינו <code>null</code>):</p>
+      <pre class="sql">select title
+from   Books
+where  isbn not in (select book_isbn from Loans)</pre>
+      <p>"מעולם לא הושאל" ⟵ אין שורת השאלה מתאימה. בבחינה — העדיפו את גרסת <code>not exists</code>.</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <p style="margin-top:0; color:var(--muted)">עכשיו ברמת הבחינה. היעזרו ב‑<a href="../reference/glossary.html#schemas">מילון הסכמות</a> אם צריך.</p>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 8 (שאלה ממבחן — תרגום מאלגברה יחסית) — כתבו שאילתת SQL <b>שקולה</b> (תחזיר את אותה תשובה) לביטוי הבא באלגברת היחסים:
+      <pre class="sql" style="margin-top:8px; background:#f3f5f9">Π damage (Accident)
+  −
+Π Accident.damage ( σ Accident.damage &gt; A.damage ( Accident × ρ A (Accident) ) )</pre>
+    </div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 1 · מועד 2 (קובץ <code>…_17419</code> / <code>…_64150</code>) · חלק ב' שאלה 1 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">פענוח הביטוי: "כל ערכי הנזק" <b>פחות</b> "כל ערך נזק שקיים נזק גדול ממנו" = נשאר רק הנזק ש<b>אין מעליו</b> נזק גדול יותר, כלומר ה<b>נזק הגבוה ביותר</b>. (<code>ρ A</code> = כינוי שני לטבלה — צירוף‑עצמי, בדיוק כמו <code>a1</code>/<code>a2</code>.)</p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select damage
+from   accident a1
+where  not exists (select *
+                   from   accident a2
+                   where  a2.damage &gt; a1.damage)</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם <code>not in</code> (תרגום ישיר של ה‑<code>−</code> באלגברה):</p>
+      <pre class="sql">select damage
+from   accident
+where  damage not in (select a1.damage
+                      from   accident a1, accident a2
+                      where  a2.damage &gt; a1.damage)</pre>
+      <p>החיסור (<code>−</code>) באלגברה היחסית ⟵ <code>not in</code> / <code>not exists</code> ב‑SQL. ה‑<code>σ ... &gt; ...</code> עם הצירוף‑העצמי (<code>Accident × ρ A(Accident)</code>) הוא בדיוק התנאי <code>a2.damage &gt; a1.damage</code>. מה שנשאר אחרי החיסור הוא הנזק שאין מעליו דבר — המקסימום.</p>
+      <p style="margin:10px 0 2px"><b>הקשר לשיעור 5:</b> זו בדיוק תבנית ה‑<code>not exists</code> ל"הכי גדול". אפשר היה גם <code>where damage = (select max(damage) from accident)</code> — אבל המבחן ביקש מפורשות את התרגום של הביטוי האלגברי, שמבנהו הוא חיסור + צירוף‑עצמי, ולכן <code>not exists</code> / <code>not in</code> היא ההמרה הישירה.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 9 (שאלה ממבחן 9.1) — לכל תאונה שבה ה<b>נהג</b> (<code>driver_id</code>) <b>אינו אחד מבעלי</b> הרכב, הצג את פרטי התאונה (<code>license</code>, <code>date</code>, <code>driver_id</code>, <code>damage</code>). <span style="color:var(--muted); font-size:13px">(במנוע ההרצה כתבו <code>[date]</code> — <code>date</code> מילה שמורה.)</span></div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 2 · מועד 1 (קובץ <code>…_16208</code>) · שאלה 9.1 (במקור באלגברת יחסים) · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select license, [date], driver_id, damage
+from   accident a
+where  not exists (select *
+                   from   owns
+                   where  owns.license = a.license
+                     and  owns.id = a.driver_id)</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם <code>not in</code>:</p>
+      <pre class="sql">select license, [date], driver_id, damage
+from   accident
+where  driver_id not in (select id
+                         from   owns
+                         where  owns.license = accident.license)</pre>
+      <p>"הנהג אינו אחד מהבעלים" ⟵ <code>not exists</code> / <code>not in</code> מול טבלת <code>owns</code> של <b>אותו</b> רכב (הקישור <code>owns.license = a.license</code> בודק בעלות על המכונית שבתאונה). בדוגמה מוחזרות 5 תאונות.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. רוצים אנשים ש<b>אין</b> להם אף רכב בתאונה, והעמודה <code>driver_id</code> עלולה להכיל <code>null</code>. מה <b>בטוח</b> יותר?</div>
+    <button class="opt" onclick="pick(this,1)"><code>not exists</code> מתואם — חסין ל‑<code>null</code></button>
+    <button class="opt" onclick="pick(this,0)"><code>not in</code> — תמיד נכון</button>
+    <button class="opt" onclick="pick(this,0)">אין הבדל, שתי הצורות זהות בכל מקרה</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. מה מבדיל תת‑שאילתה <b>מתואמת</b> (correlated) מרגילה?</div>
+    <button class="opt" onclick="pick(this,1)">הפנימית מתייחסת לשורה של החיצונית (למשל <code>o.id = p.id</code>)</button>
+    <button class="opt" onclick="pick(this,0)">היא תמיד מחזירה ערך בודד</button>
+    <button class="opt" onclick="pick(this,0)">היא חייבת להופיע ב‑<code>from</code> ולא ב‑<code>where</code></button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. שאלה ממבחן 🎓 — נתון: <code>r</code>(<code>num</code>) ו‑<code>s</code>(<code>number</code>). מה מחזירה השאילתה הבאה?
+      <pre class="sql" style="margin-top:8px; background:#f3f5f9">select num
+from   r
+where  num &gt; 40
+  and  exists (select number from s where num = 10*number)</pre>
+    </div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13px">📄 מקור: מבחן 131112 · 2025 · סמסטר 2 · מועד 1 (קובץ <code>…_36013</code> / <code>…_11251</code>) · שאלה 4. (<code>r</code> = כל המספרים 1–100, <code>s</code> = 1–10)</p>
+    <button class="opt" onclick="pick(this,1)">מספרים בין 60 ל‑100 (כלומר <code>num&gt;40</code> וגם <code>num</code> כפולה של 10 שב‑<code>s</code> → 50,60,…,100, מתוכם רק &gt;40)</button>
+    <button class="opt" onclick="pick(this,0)">קבוצה ריקה</button>
+    <button class="opt" onclick="pick(this,0)">כל המספרים מעל 40</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. שאלה ממבחן 🎓 — איזו צורה <b>שקולה</b> ל‑<code>x in (subquery)</code>?</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13px">📄 ברוח שאלת ה‑<code>some</code>/<code>all</code> במבחן 131112 · 2025 · סמסטר 2 · מועד 2 (קובץ <code>…_11402</code> / <code>…_28375</code>) · שאלה 7</p>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">x = some (subquery)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">x = all (subquery)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">x &gt; all (subquery)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q5">
+    <div class="task">5. "רכבים חדשים מ<b>כל</b> רכבי טויוטה" — איזה אופרטור?</div>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">year &gt; some (...)</button>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">year &gt; all (...)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">year in (...)</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">לא בטוח מתי <code>in</code> ומתי <code>exists</code>? רוצה לראות בדיוק איך <code>null</code> בקבוצה הופך <code>not in</code> לקבוצה ריקה, או מתי <i>חובה</i> תת‑שאילתה מתואמת? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 8 — חלוקה / "לכל" (division): "סופרים שכל ספריהם הם Fantasy", "מוסכים שטיפלו בכל היצרנים", "שואלים שקראו ספר מכל ז'אנר".</b> זו תבנית הכתר — נבנה אותה בדיוק מעל ה‑<code>not exists</code> הכפול שלמדנו היום ("אין ז'אנר שלגביו אין לו ספר").
+    <br><span style="font-size:14px; color:var(--muted)">(שאלות 7.2 ו‑7.5 בספרייה, ו‑6.2 בביטוח — כולן מסוג "לכל" — יגיעו שם.)</span>
+  </div>
+</section>
+
+<footer>
+  שיעור 7 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (תת‑שאילתות, <code>in</code>/<code>exists</code>/<code>some</code>/<code>all</code>) ושאלות מבחן 2023·מועד ב' חלק ב' ש'1, 2025·ס"ב·מ"א ש'4, 2025·ס"ב·מ"ב ש'7<br>
+  לפתיחה: <code>open lessons/0007-subqueries.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

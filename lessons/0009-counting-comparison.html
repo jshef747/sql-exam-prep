@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 9 · ספירה והשוואה — group by … having count · "הכי הרבה" · השוואה בין תקופות</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.bad{border-right-color:var(--danger); background:#fdf3f1}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:5px 12px; font-weight:700; font-family:ui-monospace,Menlo,monospace; font-size:14px}
+  .flow .ar{color:var(--muted)}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 9 · ספירה והשוואה</div>
+  <h1>ספירה והשוואה · <code>having count(...) &gt;= N</code> · "הכי הרבה" · השוואה בין תקופות</h1>
+  <p>שתי משפחות שאלות שהבחינה אוהבת. <b>(א) ספירה בקבוצה</b> — "רכבים עם <b>2 בעלים או יותר</b>", "אנשים שיש להם <b>3 מכוניות</b>", "האדם עם <b>הכי הרבה</b> מכוניות". <b>(ב) השוואה בין תקופות</b> — "רכבים שב‑2024 היו ב<b>פחות</b> תאונות מאשר ב‑2023", דרך תת‑שאילתות סקלריות מתואמות.</p>
+  <div class="goal">🎯 <b>היעד:</b> לדעת לספור בתוך קבוצה ולסנן לפי הספירה (<code>group by … having count(…) &gt;= N</code>), למצוא את ה<b>מקסימום של ספירה</b> ("הכי הרבה") בלי <code>&gt;= all</code>, ולהשוות שתי ספירות מתקופות שונות עבור אותה שורה.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה:</b> שליפה (1), צירוף (2), <code>like</code> (3), הקבצה (4), MAX/MIN (5), צירוף חיצוני ומיון (6), תת‑שאילתות (7), חלוקה/"לכל" (8). היום מחברים את שני הכלים החזקים מ‑4 ו‑7: <code>group by … having count</code> מצד אחד, ותת‑שאילתות סקלריות מתואמות מצד שני.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>street</code>, <code>city</code>, <code>birth</code></td></tr>
+    <tr><td><code>owns</code></td><td><u><code>id</code>, <code>license</code></u></td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+    <tr><td><code>garage</code></td><td><u><code>garage_id</code></u>, <code>garage_name</code>, <code>street</code>, <code>city</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html#schemas">מילון המונחים והסכמות ←</a>. נשתמש גם בסכמת הספרייה (<a href="../reference/glossary.html#schemas">ג'</a>).</p>
+  <div class="note">💡 הערה למנוע ההרצה: <code>date</code> היא מילה שמורה — כשפונים לעמודה כותבים <code>[date]</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">1</span>ספירה בקבוצה: <code>having count(…) &gt;= N</code></h2>
+  <p>בשיעור 4 ראינו ש‑<code>group by</code> מחלק את הטבלה לקבוצות, ש‑<code>count(*)</code> סופר כמה שורות יש בכל קבוצה, ושמסננים קבוצות לפי <code>having</code>. כאן זה הופך לתבנית מרכזית: <b>"ישות עם לפחות N דברים"</b> = קבץ לפי הישות, ספור, וסנן <code>having count(...) &gt;= N</code>.</p>
+  <p>דוגמה — "רכבים שיש להם <b>2 בעלים או יותר</b>". כל שורה ב‑<code>owns</code> היא צמד (בעלים, רכב); אם נקבץ לפי <code>license</code> ונספור, נקבל לכל רכב כמה בעלים יש לו:</p>
+  <pre class="sql">select license, count(*) as num_owners
+from   owns
+group  by license
+having count(*) &gt;= 2</pre>
+  <p>קוראים: "קבץ את שורות הבעלוּת לפי רכב, ספור כמה בעלים לכל רכב, והשאר רק רכבים עם ספירה ≥ 2".</p>
+
+  <h3>כשהישות בטבלה אחרת — מקבצים אחרי צירוף</h3>
+  <p>"אנשים שיש להם <b>3 מכוניות או יותר</b>". הישות (אדם) בטבלת <code>person</code>, אבל הספירה (מכוניות) בטבלת <code>owns</code> — אז קודם מצרפים, ואז מקבצים לפי האדם:</p>
+  <pre class="sql">select p.fname, p.lname, count(*) as num_cars
+from   person p join owns o on p.id = o.id
+group  by p.id, p.fname, p.lname
+having count(*) &gt;= 3</pre>
+  <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+  <pre class="sql">select p.fname, p.lname, count(*) as num_cars
+from   person p, owns o
+where  p.id = o.id
+group  by p.id, p.fname, p.lname
+having count(*) &gt;= 3</pre>
+  <div class="note">💡 למה מקבצים לפי <code>p.id</code> ולא רק לפי השם? כי שני אנשים שונים עלולים לחלוק שם פרטי+משפחה. המפתח (<code>p.id</code>) מזהה את האדם באופן חד‑משמעי; את <code>fname</code>/<code>lname</code> מוסיפים ל‑<code>group by</code> רק כדי שמותר יהיה לבחור אותם ב‑<code>select</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">2</span>"הכי הרבה" — המקסימום של ספירה</h2>
+  <p>שאלה נפוצה: לא "מי שיש לו ≥ N", אלא <b>"מי שיש לו הכי הרבה"</b> — הישות עם הספירה <b>המקסימלית</b>. כאן יש מלכודת: <code>max(count(*))</code> ישירות אינו חוקי (לא מקננים פונקציות צבירה). הפתרון הוא שני שלבים:</p>
+  <ol style="margin:0">
+    <li>ספירה לכל ישות → טבלת ביניים של ספירות.</li>
+    <li>לקחת מתוכה את ה‑<code>max</code>, ולהשאיר את הישות/ויות שספירתן שווה לו.</li>
+  </ol>
+  <p>דוגמה — "הרכב שהיה ב<b>הכי הרבה</b> תאונות". טבלת הביניים היא <code>(select count(*) from accident group by license)</code>; עליה לוקחים <code>max</code>:</p>
+  <pre class="sql">select   a.license, count(*) as num_accidents
+from     accident a
+group by a.license
+having   count(*) = (select max(c)
+                     from   (select count(*) as c
+                             from   accident
+                             group  by license) x)</pre>
+  <p>התת‑שאילתה הפנימית <code>(select count(*) as c … group by license)</code> היא <b>טבלה נגזרת</b> (subquery ב‑<code>from</code>) — שורה אחת לכל רכב עם הספירה שלו. ה‑<code>select max(c)</code> מעליה מחזיר את הספירה הגבוהה ביותר, וה‑<code>having</code> משאיר רק רכבים שספירתם שווה לה.</p>
+  <div class="warn">⚠️ <b>למה לא <code>&gt;= all</code>?</b> בשיעור 5 ראינו ש"הכי גדול" = <code>&gt;= all</code>. כאן זה <i>רעיון</i> נכון אבל מסוכן בכתיבה: <code>having count(*) &gt;= all (select count(*) … group by …)</code> מערבב <code>count</code> עם <code>all</code> וצירופים — צורה שקשה ולא תמיד נתמכת. <b>השתמשו בצורת ה‑<code>max</code> מטבלה נגזרת</b> — היא שקולה, ברורה, ורצה תמיד.</div>
+  <div class="note">💡 שימו לב: אם שתי ישויות חולקות את הספירה המקסימלית — <b>שתיהן</b> יחזרו. זה נכון: "הכי הרבה" כולל את כל מי שמחזיק בשיא. אם רוצים בדיוק אחד, מוסיפים שובר‑שוויון — אבל בבחינה מספיק להחזיר את כולם.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>השוואה בין תקופות — תת‑שאילתות סקלריות מתואמות</h2>
+  <p>המשפחה השנייה: <b>להשוות שתי ספירות עבור אותה שורה</b>. למשל "רכבים שב‑2024 היו ב<b>פחות</b> תאונות מאשר ב‑2023". לכל רכב צריך לחשב שני מספרים — מספר התאונות שלו ב‑2024 ומספר התאונות שלו ב‑2023 — ולהשוות ביניהם.</p>
+  <p>הכלי: <b>תת‑שאילתה סקלרית מתואמת</b> — תת‑שאילתה שמחזירה <b>ערך בודד</b> (מספר) ו<b>מתייחסת לשורה החיצונית</b> (דרך <code>license = c.license</code>). שמים אחת לכל תקופה, ומשווים:</p>
+  <pre class="sql">select c.license, c.model, c.brand, c.year
+from   car c
+where  (select count(*) from accident
+        where  license = c.license and [date] like '2024%')
+       &lt;
+       (select count(*) from accident
+        where  license = c.license and [date] like '2023%')</pre>
+  <p>קוראים: "לכל רכב <code>c</code>, ספור כמה תאונות שלו ב‑2024 (תת‑שאילתה ראשונה), ספור כמה ב‑2023 (תת‑שאילתה שנייה), והשאר את הרכב רק אם המספר של 2024 קטן מזה של 2023". ה‑<code>like '2024%'</code> תופס את כל התאריכים שמתחילים ב‑2024 (השדה <code>[date]</code> בפורמט <code>'YYYY-MM-DD'</code>).</p>
+  <div class="note">💡 למה תת‑שאילתה <b>סקלרית</b> ולא <code>group by</code>? כי <code>group by</code> ייתן שורה אחת לכל (רכב, שנה) — ואז קשה להעמיד "2024 מול 2023 של <i>אותו</i> רכב" באותה שורה. תת‑שאילתות סקלריות מתואמות מחשבות את שני המספרים <b>בתוך אותה שורת רכב</b>, וכך ההשוואה ישירה. זה בדיוק הכוח של ה‑correlation משיעור 7.</p></div>
+  <div class="flow">
+    <span class="t">count(...) per group</span><span class="ar">·</span>
+    <span class="t">having count = (select max ...)</span><span class="ar">·</span>
+    <span class="t">scalar(2024) &lt; scalar(2023)</span>
+  </div>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלה שבמבחנים.</p>
+
+  <h3>חימום ותרגול</h3>
+  <div class="ex">
+    <div class="task">תרגיל 1 (ספירה ≥ N) — הצג את ה‑<code>license</code> ומספר הבעלים של כל רכב ש<b>יש לו 2 בעלים או יותר</b>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select license, count(*) as num_owners
+from   owns
+group  by license
+having count(*) &gt;= 2</pre>
+      <p>"2 בעלים או יותר" ⟵ <code>group by license having count(*) &gt;= 2</code>. בדוגמה מוחזרים 3 רכבים.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 (ספירה ≥ N עם צירוף) — הצג שם פרטי, משפחה ומספר המכוניות של כל אדם ש<b>בבעלותו 3 מכוניות או יותר</b>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select p.fname, p.lname, count(*) as num_cars
+from   person p join owns o on p.id = o.id
+group  by p.id, p.fname, p.lname
+having count(*) &gt;= 3</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select p.fname, p.lname, count(*) as num_cars
+from   person p, owns o
+where  p.id = o.id
+group  by p.id, p.fname, p.lname
+having count(*) &gt;= 3</pre>
+      <p>קודם מצרפים אדם↔בעלוּת, מקבצים לפי <code>p.id</code>, וסופרים. בדוגמה מוחזר אדם אחד (David Levi, 3 מכוניות).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 (ספירה ≥ N על תאונות) — הצג <code>license</code>, <code>model</code> ומספר התאונות של כל רכב שהיה מעורב ב<b>2 תאונות או יותר</b>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select c.license, c.model, count(*) as num_accidents
+from   car c join accident a on c.license = a.license
+group  by c.license, c.model
+having count(*) &gt;= 2</pre>
+      <p>צירוף <code>car</code>↔<code>accident</code>, קיבוץ לפי הרכב, וספירת התאונות. בדוגמה מוחזרים 6 רכבים.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 ("הכי הרבה") — הצג את ה‑<code>license</code> של הרכב/ים שהיו ב<b>הכי הרבה</b> תאונות, ואת מספר התאונות שלו/הם.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select   a.license, count(*) as num_accidents
+from     accident a
+group by a.license
+having   count(*) = (select max(c)
+                     from   (select count(*) as c
+                             from   accident
+                             group  by license) x)</pre>
+      <p>"הכי הרבה" = הספירה שווה ל‑<code>max</code> של כל הספירות (טבלה נגזרת). אם כמה רכבים חולקים את השיא — כולם יחזרו (בדוגמה: 3 רכבים עם 3 תאונות כל אחד).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 5 ("הכי הרבה" עם צירוף) — הצג שם פרטי ומשפחה של האדם/ים ש<b>בבעלותו הכי הרבה</b> מכוניות, ומספר המכוניות.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select   p.fname, p.lname, count(*) as num_cars
+from     person p join owns o on p.id = o.id
+group by p.id, p.fname, p.lname
+having   count(*) = (select max(c)
+                     from   (select count(*) as c
+                             from   owns
+                             group  by id) x)</pre>
+      <p>אותו דפוס כמו תרגיל 4, אבל הישות (אדם) דורשת צירוף, והטבלה הנגזרת סופרת לכל <code>id</code> כמה רכבים. בדוגמה: David Levi עם 3 מכוניות.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 6 (השוואה בין תקופות — הכיוון ההפוך) — הצג <code>license</code>, <code>model</code>, <code>brand</code> של רכבים שב‑2024 היו ב<b>יותר</b> תאונות מאשר ב‑2023.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select c.license, c.model, c.brand
+from   car c
+where  (select count(*) from accident
+        where  license = c.license and [date] like '2024%')
+       &gt;
+       (select count(*) from accident
+        where  license = c.license and [date] like '2023%')</pre>
+      <p>שתי תת‑שאילתות סקלריות מתואמות (<code>license = c.license</code>), אחת לכל שנה, והשוואה <code>&gt;</code>. בדוגמה מוחזרים 9 רכבים.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 7 (ספרייה, "הכי הרבה") — הצג את שם השואל/ים (<code>name</code>) ש<b>השאיל הכי הרבה</b> ספרים, ואת מספר ההשאלות.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Borrowers(borrower_id, name, …)</code> · <code>Loans(loan_id, book_isbn, borrower_id, …)</code></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select   br.name, count(*) as num_loans
+from     Borrowers br join Loans l on br.borrower_id = l.borrower_id
+group by br.borrower_id, br.name
+having   count(*) = (select max(c)
+                     from   (select count(*) as c
+                             from   Loans
+                             group  by borrower_id) x)</pre>
+      <p>אותו דפוס "הכי הרבה" בסכמת הספרייה. בדוגמה יש שוויון בשיא, ולכן מוחזרים 2 שואלים (4 השאלות כל אחד).</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <p style="margin-top:0; color:var(--muted)">עכשיו ברמת הבחינה. היעזרו ב‑<a href="../reference/glossary.html#schemas">מילון הסכמות</a> אם צריך.</p>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 8 (שאלה ממבחן 9.2 — "הכי הרבה") — <b>מצא האדם שיש לו הכי הרבה מכוניות שהשתתפו בתאונה.</b> הצג שם פרטי, משפחה, ומספר המכוניות.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 2 · מועד 1 (קובץ <code>…_16208</code>) · שאלה 9.2 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <p style="margin:2px 0 8px; color:var(--muted); font-size:13.5px">רמז: סופרים לכל אדם <b>כמה מהמכוניות שבבעלותו</b> היו בתאונה — לא כמה תאונות. כדי לספור מכוניות (ולא תאונות), מצרפים את <code>owns</code> לקבוצת ה‑<code>license</code> ה<b>ייחודיים</b> שמופיעים ב‑<code>accident</code>.</p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select   p.fname, p.lname, count(*) as num_cars
+from     person p join owns o on p.id = o.id
+         join (select distinct license from accident) al
+              on o.license = al.license
+group by p.id, p.fname, p.lname
+having   count(*) = (select max(cc)
+                     from   (select count(*) as cc
+                             from   owns o2
+                                    join (select distinct license from accident) al2
+                                         on o2.license = al2.license
+                             group  by o2.id) x)</pre>
+      <p>הצירוף ל‑<code>(select distinct license from accident)</code> משאיר רק מכוניות שהיו ב<b>לפחות</b> תאונה אחת — ושומר שורה אחת לכל מכונית כזו (לא לכל תאונה!), כדי שהספירה תהיה ספירת <b>מכוניות</b>. אחר כך זו אותה תבנית "הכי הרבה" כמו תרגיל 5. בדוגמה: David Levi עם 3 מכוניות שהיו בתאונה.</p>
+      <p style="margin:10px 0 2px"><b>מלכודת:</b> אילו היינו מצרפים ישירות <code>owns join accident</code>, מכונית שהייתה ב‑3 תאונות הייתה נספרת 3 פעמים — והתשובה הייתה ספירת תאונות, לא מכוניות. ה‑<code>distinct license</code> (או <code>count(distinct o.license)</code>) הוא מה שעושה את ההבדל.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 9 (שאלה ממבחן 6.4 — ספירה ≥ 2 עם סינון) — <b>הצג את רשומות התאונה של מכוניות שיש להן יותר מבעלים אחד (שני בעלים או יותר) שגרים בעיר חיפה (Haifa).</b> הצג את כל פרטי רשומת התאונה. <span style="color:var(--muted); font-size:13px">(כתבו <code>[date]</code> במנוע ההרצה.)</span></div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2025 · סמסטר 1 · מועד 2 (קובץ <code>…_15480</code>) · שאלה 6.4 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select a.accident_id, a.license, a.[date], a.driver_id, a.damage, a.garage_id
+from   accident a
+where  a.license in
+       (select   o.license
+        from     owns o join person p on o.id = p.id
+        group by o.license
+        having   count(*) &gt;= 2
+             and sum(case when p.city = 'Haifa' then 1 else 0 end) &gt;= 1)</pre>
+      <p>הליבה היא תת‑שאילתה שמחזירה את ה‑<code>license</code> של מכוניות "כשרות": מקבצים בעלוּת+אדם לפי רכב, דורשים <code>count(*) &gt;= 2</code> (שני בעלים או יותר), ובאותו <code>having</code> דורשים שלפחות אחד מהם גר בחיפה (<code>sum(case … &gt;= 1</code>). אחר כך החיצונית שולפת את <b>רשומות התאונה</b> של כל המכוניות האלו עם <code>in</code>. בדוגמה מוחזרות 5 רשומות תאונה (מכוניות 77‑777‑77 ו‑12‑121‑12).</p>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הסבר ה‑<code>sum(case …)</code>: זו "ספירה מותנית" — <code>count</code> רק של הבעלים מחיפה. <code>&gt;= 1</code> = "לפחות בעלים אחד מחיפה". זהו דפוס שימושי לשילוב תנאי בתוך הקבצה.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 10 (שאלה ממבחן 6.5 — השוואה בין תקופות) — <b>מצא מכוניות (פרטים מלאים של המכונית) שבשנת 2024 השתתפו בפחות תאונות מאשר בשנת 2023.</b></div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2025 · סמסטר 1 · מועד 2 (קובץ <code>…_15480</code>) · שאלה 6.5 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select c.license, c.model, c.brand, c.year
+from   car c
+where  (select count(*) from accident
+        where  license = c.license and [date] like '2024%')
+       &lt;
+       (select count(*) from accident
+        where  license = c.license and [date] like '2023%')</pre>
+      <p>"פרטים מלאים של המכונית" ⟵ כל עמודות <code>car</code>. שתי תת‑שאילתות סקלריות מתואמות (<code>license = c.license</code>), אחת סופרת תאונות 2024 והשנייה 2023, וההשוואה <code>&lt;</code> משאירה רכבים שהמספר של 2024 קטן מזה של 2023. בדוגמה מוחזרות 5 מכוניות (כולל 55‑555‑55 ו‑77‑777‑77).</p>
+      <p style="margin:10px 0 2px"><b>שימו לב:</b> רכב שלא היה באף תאונה באף שנה מקבל <code>0 &lt; 0</code> = שקר ולכן <b>לא</b> חוזר. רכב עם תאונות רק ב‑2023 ולא ב‑2024 מקבל <code>0 &lt; (חיובי)</code> = אמת ו<b>כן</b> חוזר — זה בדיוק "פחות ב‑2024".</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. "רכבים שיש להם <b>3 בעלים או יותר</b>" — איזו תבנית?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">group by license having count(*) &gt;= 3</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">where count(*) &gt;= 3</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">having count(*) = 3 (בלי group by)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. רוצים את האדם עם <b>הכי הרבה</b> מכוניות. למה לא כותבים פשוט <code>max(count(*))</code> ב‑<code>select</code>?</div>
+    <button class="opt" onclick="pick(this,1)">אסור לקנן פונקציות צבירה — צריך טבלה נגזרת של הספירות ואז <code>max</code> מעליה</button>
+    <button class="opt" onclick="pick(this,0)"><code>max(count(*))</code> חוקי, רק איטי</button>
+    <button class="opt" onclick="pick(this,0)">צריך <code>order by</code> במקום</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. בתרגיל 8 (הכי הרבה מכוניות בתאונה) — למה מצרפים ל‑<code>(select distinct license from accident)</code> ולא ישירות ל‑<code>accident</code>?</div>
+    <button class="opt" onclick="pick(this,1)">כדי לספור <b>מכוניות</b> ולא תאונות — מכונית ב‑3 תאונות תיספר פעם אחת</button>
+    <button class="opt" onclick="pick(this,0)">כדי שהשאילתה תרוץ מהר יותר</button>
+    <button class="opt" onclick="pick(this,0)">כי <code>accident</code> אסור בצירוף</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. להשוות "תאונות 2024 מול 2023 של <b>אותו</b> רכב" — איזה כלי מתאים?</div>
+    <button class="opt" onclick="pick(this,1)">שתי תת‑שאילתות סקלריות מתואמות (<code>license = c.license</code>) שמשווים ביניהן ב‑<code>where</code></button>
+    <button class="opt" onclick="pick(this,0)"><code>group by license, year</code> בלבד</button>
+    <button class="opt" onclick="pick(this,0)"><code>having count(*) &gt;= 2</code></button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q5">
+    <div class="task">5. בתבנית "הכי הרבה", אם <b>שני</b> אנשים חולקים את מספר המכוניות המקסימלי — מה מחזירה השאילתה?</div>
+    <button class="opt" onclick="pick(this,1)">את <b>שניהם</b> (כל מי שספירתו שווה ל‑<code>max</code>)</button>
+    <button class="opt" onclick="pick(this,0)">שגיאה — "יותר משורה אחת"</button>
+    <button class="opt" onclick="pick(this,0)">רק את הראשון לפי <code>id</code></button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">לא בטוח מתי <code>having count &gt;= N</code> ומתי תבנית ה‑<code>max</code>? רוצה לראות למה ספירת מכוניות שונה מספירת תאונות, או איך <code>sum(case …)</code> סופר רק חלק מהשורות? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 10 — חלק א' של הבחינה: DDL ואלגברה יחסית.</b> <code>create table</code> עם מפתחות ראשיים וזרים, <code>foreign key … on delete cascade</code>, <code>create assertion</code>, ושאלות שקילות בין SQL לאלגברה יחסית ותרגום RA→SQL — שאלות אמריקאיות שדורשות הבנה ולא רק כתיבה.
+    <br><span style="font-size:14px; color:var(--muted)">(שאלות חלק א' Q4 ו‑Q6 ממבחן <code>…_16208</code> יגיעו שם.)</span>
+  </div>
+</section>
+
+<footer>
+  שיעור 9 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (group by/having/count, תת‑שאילתות מתואמות) ושאלות מבחן 2023·ס"ב·מ"א ש'9.2, 2025·ס"א·מ"ב ש'6.4 ו‑6.5<br>
+  לפתיחה: <code>open lessons/0009-counting-comparison.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 8 · חלוקה / "לכל" — division &amp; universal quantification</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.bad{border-right-color:var(--danger); background:#fdf3f1}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:5px 12px; font-weight:700; font-family:ui-monospace,Menlo,monospace; font-size:14px}
+  .flow .ar{color:var(--muted)}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 8 · חלוקה / "לכל"</div>
+  <h1>חלוקה · "לכל" / "כל" — universal quantification (division)</h1>
+  <p>תבנית הכתר של הבחינה. איך עונים על "אדם שמכוניותיו תוקנו ב<b>כל</b> מוסכי יפו", "סופר ש<b>כל</b> ספריו הם Fantasy", "מוסך שטיפל ב<b>כל</b> היצרנים" — שאלות שבהן מבקשים ישות שמכסה את <b>כל</b> איברי קבוצה כלשהי (היקום).</p>
+  <div class="goal">🎯 <b>היעד:</b> לזהות שאלת "לכל" ולתרגם אותה לשתי הצורות השקולות — (1) <b>ספירה</b>: ישות מתאימה כאשר מספר האיברים שכיסתה שווה לגודל היקום; (2) <b>not exists כפול</b>: "אין איבר ביקום שהישות מפספסת". בבחינה הצורה הקלאסית היא ה‑<code>not exists</code> הכפול — נלמד אותה לעומק.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה:</b> שליפה (1), צירוף (2), <code>like</code> (3), הקבצה (4), MAX/MIN (5), צירוף חיצוני ומיון (6), תת‑שאילתות <code>in</code>/<code>exists</code>/<code>some</code>/<code>all</code> (7). בשיעור 7 ראינו <code>not exists</code> בודד ("אין לו אף…"). היום נבנה מעליו את ה‑<code>not exists</code> ה<b>כפול</b> — וגם ניתן צורת ספירה שקולה.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמות שנעבוד עליהן</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>city</code>, …</td></tr>
+    <tr><td><code>owns</code></td><td><u><code>id</code>, <code>license</code></u></td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+    <tr><td><code>garage</code></td><td><u><code>garage_id</code></u>, <code>garage_name</code>, <code>street</code>, <code>city</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html#schemas">מילון המונחים והסכמות ←</a>. נשתמש גם בסכמת הספרייה (<a href="../reference/glossary.html#schemas">ג'</a>): <code>Authors</code>, <code>Books</code>, <code>Genres</code>, <code>Book_Genres</code>.</p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>מה זאת שאלת "לכל"?</h2>
+  <p>שאלת "לכל" (universal quantification, ובאלגברה היחסית — <b>חלוקה</b>, <code>÷</code>) מבקשת ישות ש<b>מכסה את כל</b> איברי קבוצה מסוימת. נקרא לקבוצה הזו <b>היקום</b> (universe). דוגמאות מהמבחנים:</p>
+  <ul style="margin:0">
+    <li>אדם ש<b>מכוניותיו תוקנו בכל</b> המוסכים שביפו ⟵ היקום = כל מוסכי יפו.</li>
+    <li>סופר ש<b>כל ספריו</b> שייכים לז'אנר Fantasy ⟵ היקום = כל הספרים של אותו סופר.</li>
+    <li>מוסך שטיפל ב<b>כל</b> היצרנים ⟵ היקום = כל היצרנים.</li>
+  </ul>
+  <p>הקושי: ב‑SQL אין אופרטור "לכל" ישיר (אין <code>for all</code>). לכן מתרגמים אותו לאחת משתי צורות שקולות:</p>
+  <div class="flow">
+    <span class="t">count(distinct matched) = count(*) of universe</span><span class="ar">⟷</span>
+    <span class="t">not exists ( universe member NOT matched )</span>
+  </div>
+  <p>שתיהן אומרות אותו דבר: <b>"לא נשאר אף איבר ביקום שהישות לא כיסתה".</b> הצורה הראשונה סופרת; השנייה שוללת קיום של "פספוס". באלגברה היחסית זו בדיוק החלוקה (<code>÷</code>), שמוגדרת דרך חיסור: <code>R ÷ S</code> מחושב כ"כל הישויות, פחות אלה שמפספסות איבר כלשהו ב‑<code>S</code>".</p>
+</section>
+
+<section>
+  <h2><span class="step">2</span>הצורה הראשונה — ספירה (<code>count = count</code>)</h2>
+  <p>הרעיון פשוט וחזק: ישות מכסה את <b>כל</b> איברי היקום בדיוק אם <b>מספר האיברים השונים שכיסתה</b> שווה ל<b>גודל היקום כולו</b>. שאלה: "אדם שמכוניותיו תוקנו בכל מוסכי יפו". היקום = מוסכי יפו. לכל אדם נספור כמה <b>מוסכי יפו שונים</b> טיפלו במכוניותיו, ונשווה למספר הכולל של מוסכי יפו:</p>
+  <pre class="sql">select p.fname, p.lname
+from   person p
+       join owns o      on o.id = p.id
+       join accident ac on ac.license = o.license
+       join garage g    on g.garage_id = ac.garage_id and g.city = 'Jaffa'
+group by p.id, p.fname, p.lname
+having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Jaffa')</pre>
+  <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+  <pre class="sql">select p.fname, p.lname
+from   person p, owns o, accident ac, garage g
+where  o.id = p.id
+  and  ac.license = o.license
+  and  ac.garage_id = g.garage_id
+  and  g.city = 'Jaffa'
+group by p.id, p.fname, p.lname
+having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Jaffa')</pre>
+  <p>שלושה חלקים שכדאי לזהות בכל שאלת חלוקה בצורת ספירה:</p>
+  <ul style="margin:0">
+    <li><b>הישות</b> שעליה נקבצים — כאן <code>p.id</code> (האדם). ה‑<code>group by</code> תמיד על הישות.</li>
+    <li><b>סינון ליקום</b> — <code>g.city = 'Jaffa'</code>: סופרים רק התאמות שנמצאות בתוך היקום.</li>
+    <li><b>תנאי הכיסוי</b> — <code>having count(distinct &lt;member&gt;) = (select count(*) from &lt;universe&gt;)</code>. ה‑<code>distinct</code> קריטי: מכונית שתוקנה פעמיים באותו מוסך לא תיספר פעמיים.</li>
+  </ul>
+  <div class="note">💡 <b>זו הצורה שמנוע ההרצה כאן מריץ ומדרג.</b> היא הכי בטוחה לבדיקה אוטומטית, ולכן בכל תרגיל למטה <b>הפתרון הראשון</b> הוא צורת הספירה. את ה‑<code>not exists</code> הכפול (שלב 3) נביא לצידו כצורה משנית מתויגת.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>הצורה הקלאסית של הבחינה — <code>not exists</code> כפול</h2>
+  <p>זו הניסוח שמרצי הקורס מצפים לו, והוא תרגום ישיר של החלוקה באלגברה. הרעיון: ישות מכסה את כל היקום בדיוק אם <b>לא קיים</b> איבר ביקום ש<b>אין</b> לישות התאמה אליו. שתי שלילות מקוננות:</p>
+  <pre class="sql" data-norun>select p.fname, p.lname
+from   person p
+where  not exists (                                   -- no Jaffa garage...
+         select *
+         from   garage g
+         where  g.city = 'Jaffa'
+           and  not exists (                          -- ...that the person has no repair in
+                  select *
+                  from   owns o join accident ac on ac.license = o.license
+                  where  o.id = p.id
+                    and  ac.garage_id = g.garage_id))</pre>
+  <p>קוראים מבפנים החוצה:</p>
+  <ul style="margin:0">
+    <li><b>הפנימי ביותר</b> — "לאדם <code>p</code> יש תיקון במוסך <code>g</code>" (התאמה בודדת).</li>
+    <li><b><code>not exists</code> הפנימי</b> — "ה<b>מוסך <code>g</code> שהאדם פספס</b>": מוסך שאין לאדם אף תיקון בו.</li>
+    <li><b><code>not exists</code> החיצוני</b> — "אין <b>אף</b> מוסך יפו שהאדם פספס" = האדם כיסה את כל מוסכי יפו. ✓</li>
+  </ul>
+  <div class="note">📐 <b>הקשר לאלגברה היחסית:</b> זו בדיוק חלוקה (<code>÷</code>). באלגברה: <code>(π id,garage_id …) ÷ (π garage_id σ city='Jaffa' garage)</code>. ההגדרה של <code>÷</code> דרך חיסור (<code>−</code>) היא בדיוק "כל האנשים, פחות אלה שיש מוסך יפו שהם פספסו" — וזה ה‑<code>not exists</code> הכפול מילה במילה. בחלק מהמצגות מופיע גם האופרטור <code>contains</code> (קבוצת המוסכים של האדם <code>contains</code> את קבוצת מוסכי יפו) — אותו רעיון בדיוק, רק תחביר אחר שלא כל מנוע תומך בו.</div>
+  <div class="warn">⚠️ <b>למה לא נשים אותה ראשונה בפתרון?</b> מנוע ההרצה בדפדפן (AlaSQL) לא מטפל היטב בתת‑שאילתה מקוננת‑כפולה מתואמת — לכן <b>צורת הספירה היא הפתרון המדורג הראשון</b>, וה‑<code>not exists</code> הכפול מובא כצורה משנית (לא רצה כאן). <b>בבחינה על נייר</b> שתי הצורות מקובלות לחלוטין — והניסוח הכפול הוא הקלאסי.</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>וריאציה חשובה: "כל ה‑X של הישות הם מסוג Y"</h2>
+  <p>שאלות כמו "סופר שכל ספריו הם Fantasy" הן חלוקה במסווה. כאן היקום אינו קבוע לכולם — הוא <b>תלוי בישות</b>: היקום של כל סופר הוא <b>קבוצת הספרים שלו</b>. התנאי: כל ספר של הסופר שייך ל‑Fantasy.</p>
+  <p><b>צורת הספירה:</b> מספר ספרי ה‑Fantasy של הסופר שווה למספר הכולל של ספריו. את הסה"כ נביא בצירוף לטבלת ספירה נגזרת (כדי לא לתאם תת‑שאילתה בתוך <code>having</code>, מה שהמנוע לא אוהב):</p>
+  <pre class="sql" data-schema="library">select au.author_id, au.name
+from   Authors au
+       join Books b        on b.author_id = au.author_id
+       join Book_Genres bg on bg.isbn = b.isbn
+       join Genres g       on g.genre_id = bg.genre_id and g.genre_name = 'Fantasy'
+       join (select author_id aid, count(distinct isbn) cnt
+             from   Books
+             group by author_id) tc on tc.aid = au.author_id
+group by au.author_id, au.name, tc.cnt
+having count(distinct b.isbn) = tc.cnt</pre>
+  <p><b>הצורה הקלאסית של הבחינה</b> — <code>not exists</code> בודד למעשה ("אין לסופר אף ספר ש<b>אינו</b> Fantasy"). שימו לב שכאן זו שלילה כפולה רעיונית (<i>אין ספר שאין לו</i> סיווג Fantasy) אבל נוחה לכתיבה כ‑<code>not exists</code> אחד עם <code>not exists</code> פנימי על הז'אנר (לא רצה במנוע כאן):</p>
+  <pre class="sql" data-norun data-schema="library">select au.author_id, au.name
+from   Authors au
+where  not exists (                              -- no book of this author...
+         select *
+         from   Books b
+         where  b.author_id = au.author_id
+           and  not exists (                     -- ...that has no Fantasy classification
+                  select *
+                  from   Book_Genres bg join Genres g on g.genre_id = bg.genre_id
+                  where  bg.isbn = b.isbn
+                    and  g.genre_name = 'Fantasy'))</pre>
+  <p style="margin:10px 0 2px"><b>איך לזהות:</b> "כל ה‑X של הישות הם Y" ⟵ <code>not exists (X של הישות שאינו Y)</code>, או צורת ספירה: <code>count(X שהם Y) = count(כל ה‑X של הישות)</code>.</p>
+</section>
+
+<section>
+  <h2><span class="step">5</span>מתכון לזיהוי ולכתיבה — בכל שאלת "לכל"</h2>
+  <table>
+    <tr><th>שלב</th><th>שאלה שכדאי לשאול</th></tr>
+    <tr><td><b>1. הישות</b></td><td>מי מוחזר? (אדם / סופר / מוסך) ← זה ה‑<code>group by</code>, וזה הצד החיצוני ב‑<code>not exists</code>.</td></tr>
+    <tr><td><b>2. היקום</b></td><td>"בכל ה___" — מה הקבוצה שצריך לכסות? (מוסכי יפו / ספרי הסופר / כל היצרנים).</td></tr>
+    <tr><td><b>3. ההתאמה</b></td><td>מתי ישות "מכסה" איבר ביקום? (יש תיקון במוסך / הספר שייך לז'אנר).</td></tr>
+    <tr><td><b>ספירה</b></td><td><code>having count(distinct member) = (select count(*) from universe)</code></td></tr>
+    <tr><td><b>not exists כפול</b></td><td><code>not exists ( universe member where not exists ( matching ) )</code></td></tr>
+  </table>
+  <div class="exam">🎓 <b>טיפ בחינה:</b> ברגע שאתם רואים "<b>כל</b>", "<b>בכל</b>", "כל ה___ שלו הם", "<b>לכל</b> ___ קיים" — זו חלוקה. כתבו מיד את שני ה‑<code>not exists</code> המקוננים, או את שורת ה‑<code>having count = count</code>. אל תנסו <code>and</code> ידני על כל איבר — היקום לרוב לא ידוע מראש.</div>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלת "לכל" שבמבחנים. ה‑<b>פתרון הראשון</b> בכל תרגיל הוא צורת הספירה (היא שרצה ומדרגת); ה‑<code>not exists</code> הכפול מובא כצורה משנית.</p>
+
+  <h3>חימום ותרגול</h3>
+  <div class="ex">
+    <div class="task">תרגיל 1 (חימום, חלוקה) — הצג שם פרטי ומשפחה של כל אדם שמכוניותיו תוקנו ב<b>כל</b> המוסכים שב‑<code>Haifa</code>. (בנתוני הדוגמה יש מוסך יחיד בחיפה — שימו לב שזו עדיין שאלת "לכל".)</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select p.fname, p.lname
+from   person p
+       join owns o      on o.id = p.id
+       join accident ac on ac.license = o.license
+       join garage g    on g.garage_id = ac.garage_id and g.city = 'Haifa'
+group by p.id, p.fname, p.lname
+having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Haifa')</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select p.fname, p.lname
+from   person p, owns o, accident ac, garage g
+where  o.id = p.id and ac.license = o.license
+  and  ac.garage_id = g.garage_id and g.city = 'Haifa'
+group by p.id, p.fname, p.lname
+having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Haifa')</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית (<code>not exists</code> כפול, לא רצה במנוע כאן):</p>
+      <pre class="sql" data-norun>select p.fname, p.lname
+from   person p
+where  not exists (select *
+                   from   garage g
+                   where  g.city = 'Haifa'
+                     and  not exists (select *
+                                      from   owns o join accident ac on ac.license = o.license
+                                      where  o.id = p.id and ac.garage_id = g.garage_id))</pre>
+      <p>היקום = מוסכי חיפה. גם כשהיקום הוא מוסך אחד, אותו מבנה עובד. בנתונים מוחזרים דוד, משה ותמר.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 (ספרייה, "כל ה‑X של הישות") — הצג <code>author_id</code> ו‑<code>name</code> של כל סופר ש<b>כל ספריו</b> שייכים לז'אנר <code>Science</code>.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Authors(author_id, name)</code> · <code>Books(isbn, author_id, …)</code> · <code>Book_Genres(isbn, genre_id)</code> · <code>Genres(genre_id, genre_name)</code></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select au.author_id, au.name
+from   Authors au
+       join Books b        on b.author_id = au.author_id
+       join Book_Genres bg on bg.isbn = b.isbn
+       join Genres g       on g.genre_id = bg.genre_id and g.genre_name = 'Science'
+       join (select author_id aid, count(distinct isbn) cnt
+             from   Books
+             group by author_id) tc on tc.aid = au.author_id
+group by au.author_id, au.name, tc.cnt
+having count(distinct b.isbn) = tc.cnt</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית (<code>not exists</code> — "אין לסופר ספר שאינו Science", לא רצה במנוע כאן):</p>
+      <pre class="sql" data-norun>select au.author_id, au.name
+from   Authors au
+where  not exists (select *
+                   from   Books b
+                   where  b.author_id = au.author_id
+                     and  not exists (select *
+                                      from   Book_Genres bg join Genres g on g.genre_id = bg.genre_id
+                                      where  bg.isbn = b.isbn and g.genre_name = 'Science'))</pre>
+      <p>היקום תלוי‑ישות: ספרי הסופר. הספירה משווה מספר ספרי ה‑Science למספר הכולל של ספריו. בנתונים מוחזרים מחברים 11 ו‑17.</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <p style="margin-top:0; color:var(--muted)">עכשיו ברמת הבחינה. היעזרו ב‑<a href="../reference/glossary.html#schemas">מילון הסכמות</a> אם צריך.</p>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 3 (שאלה ממבחן 9.3) — מצא שמות האנשים שהמכוניות שהיו בבעלותם היו בתיקונים ב<b>כל</b> המוסכים ב‑<code>'Jaffa'</code>.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 2 · מועד 1 (קובץ <code>…_16208</code>) · שאלה 9.3 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select p.fname, p.lname
+from   person p
+       join owns o      on o.id = p.id
+       join accident ac on ac.license = o.license
+       join garage g    on g.garage_id = ac.garage_id and g.city = 'Jaffa'
+group by p.id, p.fname, p.lname
+having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Jaffa')</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select p.fname, p.lname
+from   person p, owns o, accident ac, garage g
+where  o.id = p.id and ac.license = o.license
+  and  ac.garage_id = g.garage_id and g.city = 'Jaffa'
+group by p.id, p.fname, p.lname
+having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Jaffa')</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית של הבחינה (<code>not exists</code> כפול, לא רצה במנוע כאן):</p>
+      <pre class="sql" data-norun>select p.fname, p.lname
+from   person p
+where  not exists (select *
+                   from   garage g
+                   where  g.city = 'Jaffa'
+                     and  not exists (select *
+                                      from   owns o join accident ac on ac.license = o.license
+                                      where  o.id = p.id and ac.garage_id = g.garage_id))</pre>
+      <p>היקום = שני מוסכי יפו (<code>Jaffa Auto</code> ו‑<code>Marina Garage</code>). רק דוד לוי כיסה את שניהם: מכוניותיו תוקנו בשניהם, ולכן <code>count(distinct garage_id) = 2 = </code> סך מוסכי יפו. בנתונים מוחזר <b>David Levi</b> בלבד.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 4 (שאלה ממבחן 7.2 — ספרייה) — מצא סופרים (<code>author_id</code>, <code>name</code>) ש<b>כל הספרים שכתבו שייכים</b> לז'אנר <code>Fantasy</code>.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2024 · סמסטר 2 · מועד 2 (קובץ <code>…_12219</code>) · שאלה 7.2 · סכמה <a href="../reference/glossary.html#schemas">ג' — ספרייה</a></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select au.author_id, au.name
+from   Authors au
+       join Books b        on b.author_id = au.author_id
+       join Book_Genres bg on bg.isbn = b.isbn
+       join Genres g       on g.genre_id = bg.genre_id and g.genre_name = 'Fantasy'
+       join (select author_id aid, count(distinct isbn) cnt
+             from   Books
+             group by author_id) tc on tc.aid = au.author_id
+group by au.author_id, au.name, tc.cnt
+having count(distinct b.isbn) = tc.cnt</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where (ה‑join לטבלת הספירה כתת‑שאילתה ב‑from):</p>
+      <pre class="sql">select au.author_id, au.name
+from   Authors au, Books b, Book_Genres bg, Genres g,
+       (select author_id aid, count(distinct isbn) cnt from Books group by author_id) tc
+where  b.author_id = au.author_id and bg.isbn = b.isbn
+  and  g.genre_id = bg.genre_id and g.genre_name = 'Fantasy'
+  and  tc.aid = au.author_id
+group by au.author_id, au.name, tc.cnt
+having count(distinct b.isbn) = tc.cnt</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית של הבחינה (<code>not exists</code> — "אין לסופר ספר שאינו Fantasy", לא רצה במנוע כאן):</p>
+      <pre class="sql" data-norun>select au.author_id, au.name
+from   Authors au
+where  not exists (select *
+                   from   Books b
+                   where  b.author_id = au.author_id
+                     and  not exists (select *
+                                      from   Book_Genres bg join Genres g on g.genre_id = bg.genre_id
+                                      where  bg.isbn = b.isbn and g.genre_name = 'Fantasy'))</pre>
+      <p>"כל ספריו Fantasy" = אין לו ספר שאינו Fantasy = מספר ספרי ה‑Fantasy שלו שווה לסך ספריו. בנתונים מוחזרים מחברים 10 (<code>A. Writer</code>), 15 (<code>F. Tales</code>) ו‑16 (<code>G. Sage</code>) — כל ספריהם מסווגים (גם) Fantasy.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 5 (וריאציה "כל ה‑X של הישות" — סכמת ביטוח) — מצא את היצרנים (<code>brand</code>) ש<b>כל</b> מכוניותיהם (כל רכב מאותו <code>brand</code>) היו <b>מעורבות בלפחות תאונה אחת</b>. <span style="color:var(--muted); font-size:13px">(היקום תלוי‑ישות: קבוצת המכוניות של אותו יצרן.)</span></div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 ברוח שאלות ה"לכל" על סכמת הביטוח במבחני 131112 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select c.brand
+from   car c
+       join accident ac on ac.license = c.license
+       join (select brand, count(distinct license) cnt
+             from   car
+             group by brand) tb on tb.brand = c.brand
+group by c.brand, tb.cnt
+having count(distinct c.license) = tb.cnt</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select c.brand
+from   car c, accident ac,
+       (select brand, count(distinct license) cnt from car group by brand) tb
+where  ac.license = c.license and tb.brand = c.brand
+group by c.brand, tb.cnt
+having count(distinct c.license) = tb.cnt</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית של הבחינה (<code>not exists</code> — "אין ליצרן רכב שלא היה בתאונה", לא רצה במנוע כאן):</p>
+      <pre class="sql" data-norun>select distinct c.brand
+from   car c
+where  not exists (select *
+                   from   car c2
+                   where  c2.brand = c.brand
+                     and  not exists (select *
+                                      from   accident ac
+                                      where  ac.license = c2.license))</pre>
+      <p>היקום תלוי‑ישות: מכוניות אותו יצרן. יצרן מתאים אם מספר מכוניותיו ש<b>היו</b> בתאונה שווה לסך כל מכוניותיו. בנתונים מוחזרים חמישה יצרנים (<code>Honda</code>, <code>Mazda</code>, <code>Kia</code>, <code>BMW</code>, <code>Hyundai</code>) — אצל כל אחד מהם כל הרכבים שבמאגר היו בתאונה.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. "אדם שמכוניותיו תוקנו ב<b>כל</b> מוסכי יפו" — איזו שורת <code>having</code> נכונה (צורת ספירה)?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">having count(distinct ac.garage_id) = (select count(*) from garage where city='Jaffa')</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">having count(*) &gt;= 1</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">having count(ac.garage_id) = count(*)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. בצורת ה‑<code>not exists</code> הכפול לחלוקה, מה מבטא ה‑<code>not exists</code> ה<b>פנימי</b>?</div>
+    <button class="opt" onclick="pick(this,1)">"איבר ביקום שהישות <b>פספסה</b>" (אין לה אליו התאמה)</button>
+    <button class="opt" onclick="pick(this,0)">"הישות כיסתה לפחות איבר אחד"</button>
+    <button class="opt" onclick="pick(this,0)">"היקום ריק"</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. למה ה‑<code>distinct</code> ב‑<code>count(distinct member)</code> הכרחי בצורת הספירה?</div>
+    <button class="opt" onclick="pick(this,1)">כדי שכיסוי כפול של אותו איבר ביקום (למשל אותו מוסך פעמיים) לא ייספר כשניים</button>
+    <button class="opt" onclick="pick(this,0)">כי <code>count</code> לא עובד בלי <code>distinct</code></button>
+    <button class="opt" onclick="pick(this,0)">כדי למיין את התוצאה</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. "סופר ש<b>כל ספריו</b> Fantasy" — איזה ניסוח <code>not exists</code> נכון?</div>
+    <button class="opt" onclick="pick(this,1)">not exists (ספר של הסופר ש<b>אינו</b> Fantasy)</button>
+    <button class="opt" onclick="pick(this,0)">exists (ספר Fantasy של הסופר)</button>
+    <button class="opt" onclick="pick(this,0)">not exists (ז'אנר Fantasy)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q5">
+    <div class="task">5. איזו אופרציה ב<b>אלגברה היחסית</b> מתאימה לשאלת "לכל"?</div>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">∪ (איחוד)</button>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">÷ (חלוקה / division)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">σ (בחירה / select)</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">לא בטוח לזהות מתי שאלה היא "חלוקה"? רוצה לראות צעד‑אחר‑צעד איך ה‑<code>not exists</code> הכפול שקול לצורת הספירה, או איך נראית חלוקה (<code>÷</code>) באלגברה היחסית ומדוע היא מתורגמת לחיסור? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 9 — ספירה והשוואה: ספירת צירוף‑עצמי ("≥2 בעלים", "≥3 מכוניות"), "מי שיש לו הכי הרבה", והשוואת ספירות בין קבוצות (תאונות 2024 מול 2023).</b> נמשיך לבנות על ה‑<code>group by</code>/<code>having</code> ועל תת‑השאילתות — הפעם כדי לספור ולהשוות, לא רק לכסות.
+    <br><span style="font-size:14px; color:var(--muted)">(שאלה 9.2 "האדם עם הכי הרבה מכוניות בתאונה" ושאלה 6.5 "פחות תאונות ב‑2024 מ‑2023" יגיעו שם.)</span>
+  </div>
+</section>
+
+<footer>
+  שיעור 8 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (חלוקה / <code>÷</code>, <code>not exists</code> כפול, <code>contains</code>) ושאלות מבחן 2023·ס"ב·מ"א ש'9.3 (קובץ <code>…_16208</code>) ו‑2024·ס"ב·מ"ב ש'7.2 (קובץ <code>…_12219</code>)<br>
+  לפתיחה: <code>open lessons/0008-division-for-all.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

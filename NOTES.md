@@ -46,19 +46,22 @@ Recurring SQL patterns the user MUST master:
 11. DDL: create table + primary/foreign keys; create assertion
 12. SQL ↔ relational-algebra equivalence (Part A MCQ) + translate RA→SQL
 
-## Planned lesson arc (deliver one at a time, adjust to ZPD)
-1. ✅ select-from-where + distinct (car-insurance schema)   ← Lesson 1
-2. joins (multi-table → join..on → natural)
-3. LIKE
-4. group by / having / aggregates
-5. MAX/MIN patterns
-6. outer joins + zero-count + order by
-7. subqueries (in/exists/some/all)
-8. division / "for all"
-9. correlated cross-group comparison
-10. self-join counting
-11. DDL + create assertion
-12. SQL ↔ relational algebra
+## Lesson arc (deliver one at a time, adjust to ZPD)
+DONE (built + runnable + auto-graded):
+1. ✅ select-from-where + distinct (car-insurance)
+2. ✅ joins (multi-table → join..on → natural)
+3. ✅ LIKE
+4. ✅ group by / having / aggregates
+5. ✅ MAX/MIN patterns
+6. ✅ outer joins + zero-count + order by
+7. ✅ subqueries (in/exists/some/all)
+
+REMAINING — combined 5→3 (user-approved 2026-06-28):
+8. division / "for all" (kept standalone — the crown jewel)
+9. **counting & comparison** = (old 9 correlated cross-group 2024-vs-2023, full 6.5) + (old 10 self-join counting ≥N / "the most", incl. 9.2) merged
+10. **exam Part A** = (old 11 DDL: create table/FK/create assertion, incl. cascade Q6) + (old 12 SQL↔relational-algebra equivalence + RA→SQL, incl. Q4) merged
+
+Total course now 10 lessons (was 12).
 
 ## Missing material
 - `test/...2025 סמסטר 2 מועד 1` Part B (Q9–Q11) is in a "separate appendix" not in the file. The moed-2 sibling exam has equivalent questions, so coverage is fine.

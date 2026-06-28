@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 6 · צירוף חיצוני · קבוצות עם 0 · order by</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.bad{border-right-color:var(--danger); background:#fdf3f1}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:5px 12px; font-weight:700; font-family:ui-monospace,Menlo,monospace; font-size:14px}
+  .flow .ar{color:var(--muted)}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 6 · צירוף חיצוני ומיון</div>
+  <h1>outer join · קבוצות עם 0 · order by</h1>
+  <p>איך עונים על "לכל יצרן מספר התאונות — <b>כולל</b> יצרנים עם 0 תאונות, ממוין מהגבוה לנמוך". זו בדיוק שאלה 6.4 מהבחינה, והמלכודת בה היא הסיבה שאנשים מאבדים נקודות.</p>
+  <div class="goal">🎯 <b>היעד:</b> להחזיר גם קבוצות/שורות שאין להן התאמה (שצירוף רגיל מוחק בשקט), לספור אותן נכון כ‑0, ולמיין את התוצאה.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה:</b> שליפה (1), צירוף (2), <code>like</code> (3), הקבצה <code>group by</code>/<code>having</code> (4), שאלות "הכי" MAX/MIN (5). היום נסגור את שאלה 6.4: כמו 6.4 בשיעור 4 חישבנו מספר תאונות לכל יצרן — אבל אז <b>השמטנו</b> את היצרנים עם 0 ואת המיון. עכשיו נשלים אותם.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>city</code>, …</td></tr>
+    <tr><td><code>garage</code></td><td><u><code>garage_id</code></u>, <code>garage_name</code>, <code>street</code>, <code>city</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html#schemas">מילון המונחים והסכמות ←</a></p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>הבעיה: צירוף רגיל מוחק שורות בשקט</h2>
+  <p>נחזור לשיעור 4 — מספר התאונות לכל יצרן, עם צירוף רגיל (<code>inner join</code>):</p>
+  <pre class="sql">select car.brand, count(*)
+from   car join accident on car.license = accident.license
+group by car.brand</pre>
+  <p>זה עובד — אבל יש לו חור: יצרן ש<b>אף אחד</b> מרכביו לא היה בתאונה <b>פשוט לא יופיע בתוצאה</b>. הצירוף הרגיל מחזיר רק שורות שיש להן <b>התאמה משני הצדדים</b>; רכב בלי תאונה לא מצליח להזדווג עם אף שורה ב‑<code>accident</code>, ולכן נעלם — וכך גם היצרן שלו.</p>
+  <div class="warn">⚠️ זו טעות נפוצה במבחן: השאלה מבקשת "<b>לכל</b> יצרן... כולל יצרנים עם 0 תאונות", וסטודנט כותב <code>inner join</code> — והיצרנים בלי תאונות נמחקים. כדי לשמור אותם צריך <b>צירוף חיצוני</b>.</div>
+</section>
+
+<section>
+  <h2><span class="step">2</span>הפתרון: <code>left outer join</code></h2>
+  <p>צירוף חיצוני שׁומר את כל השורות מצד אחד <b>גם אם אין להן התאמה</b> בצד השני. בצד שאין בו התאמה — העמודות מתמלאות <code>null</code> (מצגת תיאור שפת SQL, פרק הצירופים — <code>outer join</code>):</p>
+  <table>
+    <tr><th>סוג</th><th>מה מחזיר</th></tr>
+    <tr><td><code>a join b</code> (inner)</td><td>רק שורות עם התאמה בשני הצדדים</td></tr>
+    <tr><td><code>a left outer join b</code></td><td>כל שורות <b>a</b> — גם בלי התאמה ב‑b (אז עמודות b הן <code>null</code>)</td></tr>
+    <tr><td><code>a right outer join b</code></td><td>כל שורות <b>b</b> — גם בלי התאמה ב‑a</td></tr>
+  </table>
+  <p>כדי לשמור את <b>כל הרכבים</b> (ולכן כל היצרנים) — שמים את <code>car</code> משמאל ועושים <code>left outer join</code> ל‑<code>accident</code>:</p>
+  <pre class="sql">select car.brand, count(accident.accident_id)
+from   car left outer join accident on car.license = accident.license
+group by car.brand</pre>
+  <p>עכשיו רכב בלי תאונה עדיין נכנס לתוצאה — עם <code>accident_id</code> = <code>null</code>. הוא שומר את היצרן שלו "חי" בתוצאה. נשאר רק לספור נכון — וכאן המלכודת הגדולה של השיעור.</p>
+  <div class="note">💡 <code>left</code> מול <code>right</code> הוא רק עניין של <b>איזה צד תרצה לשמור במלואו</b>. <code>car left outer join accident</code> שקול ל‑<code>accident right outer join car</code>. בחרו תמיד את הצד שאתם רוצים שיופיע "כולו" — כאן זה <code>car</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>⭐ הלב: <code>count(&lt;עמודה מהצד הימני&gt;)</code> ולא <code>count(*)</code></h2>
+  <p>זו הנקודה היחידה הכי חשובה בשיעור. אחרי <code>left outer join</code>, רכב בלי תאונה מופיע כשורה אחת שכל עמודות <code>accident</code> בה הן <code>null</code>. עכשיו:</p>
+  <table>
+    <tr><th>מה כותבים</th><th>מה קורה לקבוצה ללא התאמה</th></tr>
+    <tr><td><code>count(*)</code></td><td>סופר <b>שורות</b> — והשורה ה"מרופדת" ב‑null נספרת, אז יוצא <b>1</b> ❌</td></tr>
+    <tr><td><code>count(accident.accident_id)</code></td><td>סופר ערכים <b>שאינם null</b> — ולכן יוצא <b>0</b> ✓</td></tr>
+  </table>
+  <p>הכלל מהשיעור הראשון על הקבצה חוזר כאן בעוצמה: <code>count(x)</code> <b>מתעלם מ‑null</b>. בקבוצה בלי שום התאמה, כל ה‑<code>accident.accident_id</code> הם <code>null</code> — אז הספירה היא 0, בדיוק מה שרצינו.</p>
+
+  <h3>דוגמה מספרית (כדאי לקרוא לאט)</h3>
+  <p>נראה את ההבדל על שאלה אמיתית: לכל <b>נהג</b> (טבלת <code>person</code>) — כמה תאונות נהג? (הקשר הוא <code>person.id = accident.driver_id</code>.) נשמור את כל האנשים עם <code>left outer join</code>. הצורה ה<b>נכונה</b> — <code>count(accident.accident_id)</code> — נותנת 0 לנהג שלא נהג בתאונה:</p>
+  <pre class="sql">select person.id, count(accident.accident_id)
+from   person left outer join accident on person.id = accident.driver_id
+group by person.id</pre>
+  <p>בנתוני הדוגמה, האנשים <code>103</code>, <code>106</code>, <code>112</code> לא היו נהגים באף תאונה. עם השאילתה הזו הם מקבלים <code>0</code> — נכון. אבל אם נחליף ל‑<code>count(*)</code> (הצורה ה<b>שגויה</b>), אותם נהגים יקבלו <code>1</code> במקום <code>0</code>:</p>
+  <pre class="sql bad">select person.id, count(*)
+from   person left outer join accident on person.id = accident.driver_id
+group by person.id</pre>
+  <p>אותם 103/106/112 יקבלו <code>1</code> — כי השורה המרופדת ב‑null נספרה. <b>הריצו את שתי השאילתות עם ▶ והשוו בעצמכם</b> את השורות של 103/106/112.</p>
+  <div class="warn">⚠️ אם תכתבו <code>count(*)</code> אחרי <code>outer join</code>, כל קבוצה "ריקה" תקבל 1 במקום 0 — וזו בדיוק הטעות שמורידה את הנקודה בשאלה 6.4. אחרי <code>outer join</code>, ספרו תמיד עמודה מ<b>הצד שאולי חסר</b> (הצד שיכול להתמלא null).</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>מיון: <code>order by ... asc | desc</code></h2>
+  <p><code>order by</code> מסדר את התוצאה הסופית. תמיד הפסוק <b>האחרון</b> בשאילתה (אחרי <code>group by</code>/<code>having</code>). <code>asc</code> = עולה (קטן→גדול, וזו ברירת המחדל), <code>desc</code> = יורד (גדול→קטן). למשל, מספר הרכבים לכל יצרן, מהיצרן עם הכי הרבה רכבים אל המעטים ביותר:</p>
+  <pre class="sql">select brand, count(*)
+from   car
+group by brand
+order by count(*) desc</pre>
+  <p>אפשר למיין לפי עמודה רגילה, לפי תוצאת הקבצה (כמו למעלה), ואפשר לפי כמה מפתחות בזה אחר זה: <code>order by city asc, lname desc</code> — קודם לפי עיר עולה, ובתוך כל עיר לפי שם משפחה יורד.</p>
+  <div class="flow">
+    <span class="t">from</span><span class="ar">→</span>
+    <span class="t">where</span><span class="ar">→</span>
+    <span class="t">group by</span><span class="ar">→</span>
+    <span class="t">having</span><span class="ar">→</span>
+    <span class="t">select</span><span class="ar">→</span>
+    <span class="t">order by</span>
+  </div>
+  <div class="note">💡 <code>order by</code> רץ <b>אחרון</b> בסדר הלוגי. לכן מותר למיין גם לפי כינוי (alias) או לפי תוצאת הקבצה — בשלב הזה הכול כבר חושב.</div>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלה שבמבחנים.</p>
+  <div class="note">ℹ️ <b>לגבי המיון:</b> הבודק האוטומטי בודק שה<b>שורות</b> נכונות, לא את סדר המיון — ודאו את ה‑<code>order by</code> בעצמכם בעין.</div>
+
+  <h3>חימום ותרגול</h3>
+  <div class="ex">
+    <div class="task">תרגיל 1 — הצג את כל הרכבים, ממוינים לפי שנת הייצור <b>מהחדש לישן</b> (יורד).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select *
+from   car
+order by year desc</pre>
+      <p><code>order by year desc</code> — <code>desc</code> = יורד = מהשנה הגבוהה לנמוכה. בלי <code>desc</code> (כלומר <code>asc</code>) היה ממיין מהישן לחדש.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 — לכל <b>מוסך</b> (<code>garage_id</code>, <code>garage_name</code>) הצג את מספר התאונות שטיפל בהן, <b>כולל מוסכים עם 0 תאונות</b>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select garage.garage_id, garage.garage_name, count(accident.accident_id)
+from   garage left outer join accident on garage.garage_id = accident.garage_id
+group by garage.garage_id, garage.garage_name</pre>
+      <p>"כולל מוסכים עם 0" ⟵ <code>left outer join</code> משומר את <code>garage</code>, ו‑<code>count(accident.accident_id)</code> נותן 0 למוסך בלי תאונות (לא <code>count(*)</code>!).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 — לכל <b>אדם</b> (<code>id</code>, <code>fname</code>, <code>lname</code>) הצג כמה תאונות נהג בהן (לפי <code>driver_id</code>), כולל מי שנהג ב‑0, ממוין <b>יורד</b> לפי מספר התאונות.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select person.id, person.fname, person.lname, count(accident.accident_id)
+from   person left outer join accident on person.id = accident.driver_id
+group by person.id, person.fname, person.lname
+order by count(accident.accident_id) desc</pre>
+      <p>אותה תבנית: שמירת כל ה‑<code>person</code> עם <code>left outer join</code>, ספירת עמודה מהצד שעלול להיות חסר (<code>accident.accident_id</code>) כדי לקבל 0, ומיון יורד. אנשים 103/106/112 יוצאים עם 0.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 — לכל <b>יצרן</b> (<code>brand</code>) הצג את מספר התאונות שבהן היו מעורבים רכביו, <b>כולל יצרנים עם 0 תאונות</b>, ממוין יורד.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select car.brand, count(accident.accident_id)
+from   car left outer join accident on car.license = accident.license
+group by car.brand
+order by count(accident.accident_id) desc</pre>
+      <p>זו שאלה 6.4 בלי תנאי ה‑≥3 מכוניות. שלושת הרכיבים: <code>left outer join</code> (לשמור את כל היצרנים) + <code>count(accident.accident_id)</code> (כדי לקבל 0 ולא 1) + <code>order by ... desc</code>.</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <p style="margin-top:0; color:var(--muted)">עכשיו ברמת הבחינה. היעזרו ב‑<a href="../reference/glossary.html#schemas">מילון הסכמות</a> אם צריך.</p>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 5 (שאלה 6.4 המלאה) — לכל יצרן מכוניות (<code>brand</code>) שיש לו <b>לפחות שלוש מכוניות</b>, מצא את מספר התאונות שבהן היו מעורבות מכוניותיו. <b>השתמש ב‑outer join כך שגם יצרנים עם 0 תאונות יופיעו</b>, ו<b>מיין יורד</b> לפי מספר התאונות.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2025 · סמסטר 1 · מועד 1 (קובץ <code>…_12364</code>) · שאלה 6.4 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select car.brand, count(accident.accident_id)
+from   car left outer join accident on car.license = accident.license
+group by car.brand
+having count(distinct car.license) &gt;= 3
+order by count(accident.accident_id) desc</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם תת‑שאילתה לתנאי "≥3 מכוניות":</p>
+      <pre class="sql">select car.brand, count(accident.accident_id)
+from   car left outer join accident on car.license = accident.license
+where  car.brand in (select brand
+                     from   car
+                     group by brand
+                     having count(*) &gt;= 3)
+group by car.brand
+order by count(accident.accident_id) desc</pre>
+      <p>שלוש המלכודות בשאלה הזו, וכך נמנעים מהן:</p>
+      <ul style="margin:0">
+        <li><b>0 תאונות:</b> <code>left outer join</code> במקום <code>inner join</code> — אחרת יצרן בלי תאונות נמחק.</li>
+        <li><b>ספירה:</b> <code>count(accident.accident_id)</code> ולא <code>count(*)</code> — אחרת יצרן בלי תאונות מקבל 1.</li>
+        <li><b>"לפחות 3 מכוניות":</b> <code>count(distinct car.license)</code> (לא <code>count(*)</code>, כי אחרי הצירוף לרכב עם כמה תאונות יש כמה שורות).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 6 (שאלה 7.4 — סכמת ספרייה) — לכל ז'אנר (<code>genre_id</code>, <code>genre_name</code>) מצא את מספר העותקים (<code>num_copies</code>) הממוצע לספר בז'אנר. שִׁמרו את <b>כל</b> הז'אנרים בעזרת צירוף חיצוני, ומיינו יורד לפי הממוצע.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2024 · סמסטר 2 · מועד 2 (קובץ <code>…_12219</code>) · שאלה 7.4 · סכמה <a href="../reference/glossary.html#schemas">ג' — ספרייה</a></p>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Genres(genre_id, genre_name)</code> · <code>Book_Genres(isbn, genre_id)</code> · <code>Books(isbn, …, num_copies)</code></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select Genres.genre_id, Genres.genre_name, avg(Books.num_copies)
+from   Genres left outer join Book_Genres on Genres.genre_id = Book_Genres.genre_id
+              left outer join Books       on Book_Genres.isbn = Books.isbn
+group by Genres.genre_id, Genres.genre_name
+order by avg(Books.num_copies) desc</pre>
+      <p>השאלה היא "לכל ז'אנר... הממוצע" — בדיוק תבנית ההקבצה מהשיעור הקודם, אבל כדי <b>לא לאבד ז'אנר ללא ספרים</b> צירפנו בצירוף חיצוני (<code>left outer join</code>) המשמר את <code>Genres</code>. ז'אנר בלי ספרים יקבל ממוצע <code>null</code> (ולא ייעלם), בדיוק כמו שיצרן ללא תאונות מקבל 0. הוספנו <code>order by avg(...) desc</code> למיון מהממוצע הגבוה לנמוך.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 7 (שאלה ממבחן 9.4) — לכל אדם הצג <code>id</code>, <code>fname</code>, <code>lname</code>, ואת <b>מספר התאונות</b> שבהן היו מעורבות מכוניות שבבעלותו — <b>כולל אנשים שאף אחת ממכוניותיהם לא הייתה מעורבת בתאונה</b> (צריכים להופיע עם 0).</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 2 · מועד 1 (קובץ <code>…_16208</code>) · שאלה 9.4 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">השאלה המקורית מבקשת להגדיר <b>תצפית</b> (<code>create view pers_acc as ...</code>) — את עטיפת ה‑<code>create view</code> נלמד בשיעור ה‑DDL; כאן כותבים את ה‑<code>select</code> שבתוכה.</p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select person.id, person.fname, person.lname, count(accident.accident_id)
+from   person left outer join owns     on person.id = owns.id
+              left outer join accident on owns.license = accident.license
+group by person.id, person.fname, person.lname</pre>
+      <p>שני צירופים חיצוניים שומרים על כל אדם: גם מי שאין לו רכב, וגם מי שיש לו רכב ללא תאונות. הספירה <code>count(accident.accident_id)</code> (עמודה מהצד שאולי חסר) נותנת <b>0</b> ולא 1 לאדם ללא תאונות — בדיוק מלכודת השיעור. בנתוני הדוגמה נועה וליאור מקבלים 0.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. רוצים "לכל יצרן מספר התאונות, <b>כולל</b> יצרנים עם 0 תאונות". איזה צירוף נכון?</div>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">car join accident on car.license = accident.license</button>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">car left outer join accident on car.license = accident.license</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">car, accident where car.license = accident.license</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. אחרי <code>left outer join</code>, מדוע <code>count(*)</code> נותן 1 ליצרן בלי תאונות במקום 0?</div>
+    <button class="opt" onclick="pick(this,1)">כי השורה המרופדת ב‑<code>null</code> עדיין נספרת כשורה; <code>count(*)</code> סופר שורות</button>
+    <button class="opt" onclick="pick(this,0)">כי <code>count</code> תמיד מתחיל מ‑1</button>
+    <button class="opt" onclick="pick(this,0)">כי <code>outer join</code> מכפיל כל שורה</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. מה הצורה הנכונה לספור תאונות אחרי הצירוף החיצוני, כך שקבוצה ללא התאמה תקבל 0?</div>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">count(*)</button>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">count(accident.accident_id)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">count(car.brand)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. איפה ממוקם <code>order by</code> בסדר הלוגי, ומה מציין <code>desc</code>?</div>
+    <button class="opt" onclick="pick(this,1)">אחרון מכולם; <code>desc</code> = מיון יורד (גדול→קטן)</button>
+    <button class="opt" onclick="pick(this,0)">לפני <code>group by</code>; <code>desc</code> = מיון עולה</button>
+    <button class="opt" onclick="pick(this,0)">במקום <code>having</code>; <code>desc</code> = מסיר כפילויות</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">לא בטוח מתי <code>left</code> ומתי <code>right</code>? רוצה לראות מה קורה כש‑<code>count(*)</code> מול <code>count(col)</code> נותנים תוצאות שונות על אותם נתונים, או איך מתנהג <code>order by</code> כשיש ערכי <code>null</code>? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 7 — תת‑שאילתות: <code>in</code> / <code>not in</code> / <code>exists</code> / <code>not exists</code> / <code>some</code> / <code>all</code>.</b> נעמיק בכלי שכבר הצצנו אליו (ב‑5 וב‑6.4): שאילתה בתוך שאילתה — הבסיס לשאלות "מי שעשה / מי שלא עשה" ולשאלות ה"לכל" (חלוקה) שמגיעות בהמשך.
+  </div>
+</section>
+
+<footer>
+  שיעור 6 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (צירופים חיצוניים, <code>order by</code>) ושאלה 6.4 מהבחינה (קובץ <code>…_12364</code>)<br>
+  לפתיחה: <code>open lessons/0006-outer-join-order-by.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 5 · שאלות "הכי" — MAX / MIN</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.bad{border-right-color:var(--danger); background:#fdf3f1}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:5px 12px; font-weight:700; font-family:ui-monospace,Menlo,monospace; font-size:14px}
+  .flow .ar{color:var(--muted)}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 5 · שאלות "הכי"</div>
+  <h1>MAX / MIN · הגבוה ביותר · הנמוך ביותר · הכי הרבה</h1>
+  <p>איך עונים על "הרכב החדש ביותר", "התאונה עם הנזק הגבוה ביותר", "היצרן עם הכי הרבה רכבים". זו אחת התבניות שחוזרות בכל מבחן בחלק ב'.</p>
+  <div class="goal">🎯 <b>היעד:</b> למצוא את ה<b>שורה</b> (לא רק את הערך) שבה ערך מסוים הוא המקסימום/מינימום — גם כשהערך עצמו הוא תוצאת הקבצה.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה:</b> שליפה (1), צירוף (2), <code>like</code> (3), הקבצה <code>group by</code> / <code>having</code> (4). היום נשתמש בהכול יחד כדי למצוא את ה"הכי".</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">תזכורת: ב‑<code>accident</code> כל שורה היא <b>רכב אחד בתאונה</b> (המפתח הוא הצמד <code>accident_id, license</code>), ו‑<code>damage</code> הוא הנזק <b>לאותו רכב</b>. לכן ל‑<code>accident_id</code> אחד יכולות להיות כמה שורות. סכמה מלאה ב‑<a href="../reference/glossary.html#schemas">מילון המונחים והסכמות ←</a></p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>הצורה הפשוטה — <code>= (select max(...))</code></h2>
+  <p>השאלה "מצא את הרכב ה<b>חדש ביותר</b>" היא בעצם: מצא את השורה שבה <code>year</code> שווה לערך ה‑<code>max</code> של <code>year</code>. את הערך המקסימלי מחשבים בתת‑שאילתה, ואז משווים אליו:</p>
+  <pre class="sql">select *
+from   car
+where  year = (select max(year) from car)</pre>
+  <p>תת‑השאילתה <code>(select max(year) from car)</code> מחזירה <b>מספר בודד</b> — שנת הייצור הגבוהה ביותר — ואנחנו שולפים כל רכב שזו שנתו. אם יש כמה רכבים מאותה שנה מקסימלית, כולם יחזרו (וזה הנכון).</p>
+  <p>אותו רעיון ל‑<b>מינימום</b> — הרכב הישן ביותר:</p>
+  <pre class="sql">select *
+from   car
+where  year = (select min(year) from car)</pre>
+  <div class="note">💡 למה לא פשוט <code>select max(year) from car</code>? כי זה יחזיר רק את ה<b>מספר</b> (למשל 2024), לא את ה<b>רכב</b> — לא את ה‑<code>license</code>, ה‑<code>model</code> וכו'. כשמבקשים "את הרכב/את התאונה" — צריך לשלוף שורה, ולכן צריך את תבנית תת‑השאילתה.</div>
+</section>
+
+<section>
+  <h2><span class="step">2</span>אותו דבר עם <code>&gt;= all</code></h2>
+  <p>"הגבוה ביותר" = גדול‑או‑שווה ל<b>כל</b> הערכים. את זה כותבים עם <code>&gt;= all</code> מול קבוצת כל הערכים (מצגת תיאור שפת SQL, פרק תת‑שאילתות — <code>some</code> / <code>all</code>):</p>
+  <pre class="sql">select *
+from   car
+where  year &gt;= all (select year from car)</pre>
+  <p>שתי הצורות שקולות. <code>= (select max(...))</code> בדרך כלל קריאה יותר; <code>&gt;= all</code> שימושית כשאין פונקציית <code>max</code> נוחה (נראה את כוחה בשלב 4, על תוצאות הקבצה).</p>
+  <table>
+    <tr><th>בעברית</th><th>תבנית</th></tr>
+    <tr><td>הגבוה ביותר</td><td><code>= (select max(x) ...)</code> · <code>&gt;= all (...)</code></td></tr>
+    <tr><td>הנמוך ביותר</td><td><code>= (select min(x) ...)</code> · <code>&lt;= all (...)</code></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="step">3</span>"אף אחד לא גדול ממנו" — <code>not exists</code> (טריק האלגברה היחסית)</h2>
+  <p>יש דרך שלישית, בלי <code>max</code> ובלי <code>all</code>: ערך הוא המקסימלי בדיוק אם <b>לא קיים</b> ערך גדול ממנו. במצגת זו הצורה של חיסור/צירוף‑עצמי באלגברה היחסית; ב‑SQL זה <code>not exists</code> מול עותק שני של הטבלה (כינוי = alias):</p>
+  <pre class="sql">select *
+from   car c1
+where  not exists (select *
+                   from   car c2
+                   where  c2.year &gt; c1.year)</pre>
+  <p>קוראים את זה: "החזר רכב <code>c1</code> שלגביו <b>לא קיים</b> רכב <code>c2</code> חדש ממנו". מי שאין מעליו אף אחד — הוא המקסימום. שימו לב לשימוש בשני כינויים (<code>c1</code>, <code>c2</code>) לאותה טבלה — זה צירוף‑עצמי.</p>
+  <div class="note">💡 שלוש הדרכים (<code>= max</code>, <code>&gt;= all</code>, <code>not exists</code>) מחזירות אותה תוצאה. בבחינה — בחרו את הקריאה ביותר עבורכם. לרוב זו <code>= (select max ...)</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>הלב: מקסימום של <b>תוצאת הקבצה</b></h2>
+  <p>עד כאן המקסימום היה על עמודה רגילה. אבל הרבה שאלות מבחן שואלות על המקסימום של <b>ערך מחושב לכל קבוצה</b> — "היצרן עם הכי הרבה רכבים", "התאונה עם הנזק הממוצע הגבוה ביותר". כאן מחברים את <code>group by</code> מהשיעור הקודם עם תבנית ה‑MAX.</p>
+
+  <h3>דוגמה: היצרן עם הכי הרבה רכבים</h3>
+  <p>קודם — מספר הרכבים לכל יצרן (זה שיעור 4):</p>
+  <pre class="sql">select brand, count(*)
+from   car
+group by brand</pre>
+  <p>עכשיו רוצים רק את היצרן שה‑<code>count</code> שלו הוא הגבוה ביותר. אי אפשר לכתוב <code>max(count(*))</code> — אסור לקנן פונקציות הקבצה! במקום זאת מסננים ב‑<code>having</code> את הקבוצה שה‑<code>count</code> שלה <code>&gt;= all</code> כל ה‑<code>count</code>‑ים:</p>
+  <pre class="sql">select brand, count(*)
+from   car
+group by brand
+having count(*) &gt;= all (select count(*)
+                       from   car
+                       group by brand)</pre>
+  <p>סדר המחשבה: (1) חשב <code>count</code> לכל יצרן, (2) חשב את אותם <code>count</code>‑ים שוב בתת‑שאילתה, (3) השאר רק את הקבוצה ש‑<code>count</code> שלה גדול‑או‑שווה לכולם.</p>
+  <div class="warn">⚠️ <code>select brand, max(count(*)) from car group by brand</code> — <b>שגוי</b>. קינון <code>max(count(...))</code> אסור, וגם — אנחנו רוצים להחזיר את <b>שם היצרן</b> יחד עם המקסימום, מה שמחייב את תבנית ה‑<code>having ... &gt;= all</code>.</div>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלה שבמבחנים.</p>
+
+  <h3>חימום ותרגול</h3>
+  <div class="ex">
+    <div class="task">תרגיל 1 — הצג את כל הפרטים של הרכב/ים ה<b>חדש/ים ביותר</b> (שנת הייצור הגבוהה ביותר).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select *
+from   car
+where  year = (select max(year) from car)</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם <code>&gt;= all</code>:</p>
+      <pre class="sql">select *
+from   car
+where  year &gt;= all (select year from car)</pre>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 — הצג את התאונה/ות עם ה<b>נזק הגבוה ביותר</b> (העמודה <code>damage</code> — לרכב בודד, בלי הקבצה).</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select *
+from   accident
+where  damage = (select max(damage) from accident)</pre>
+      <p>אותה תבנית כמו תרגיל 1, על עמודה אחרת. שולפים שורות (לא רק את הערך), ולכן תת‑שאילתה ולא <code>select max(damage)</code> לבד.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 — הצג את הרכב הישן ביותר, אך הפעם <b>בלי</b> <code>max</code>/<code>min</code> — בעזרת <code>not exists</code> ("אף רכב לא ישן ממנו").</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select *
+from   car c1
+where  not exists (select *
+                   from   car c2
+                   where  c2.year &lt; c1.year)</pre>
+      <p>"ישן ביותר" = אין אף רכב עם <code>year</code> קטן יותר. זהו טריק הצירוף‑העצמי מהאלגברה היחסית.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 — הצג את ה<b>יצרן</b> שיש לו הכי הרבה רכבים, ואת מספר הרכבים שלו.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select brand, count(*)
+from   car
+group by brand
+having count(*) &gt;= all (select count(*)
+                       from   car
+                       group by brand)</pre>
+      <p>מקסימום של תוצאת הקבצה: <code>having count(*) &gt;= all (אותו count לכל הקבוצות)</code>. זה בדיוק המבנה שנצטרך בשאלת המבחן הבאה.</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <p style="margin-top:0; color:var(--muted)">עכשיו ברמת הבחינה. היעזרו ב‑<a href="../reference/glossary.html#schemas">מילון הסכמות</a> אם צריך.</p>
+
+  <div class="ex">
+    <div class="task">🎓 תרגיל 5 (שאלה ממבחן — <b>שאלה 6.3 המלאה</b>) — מצא את התאונה (הצג <code>accident_id</code>, מספר המכוניות המעורבות בתאונה, והנזק הממוצע למכונית) שבה ה<b>נזק הממוצע למכונית הוא הגבוה ביותר</b>.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2025 · סמסטר 1 · מועד 2 (קובץ <code>…_15480</code>) · שאלה 6.3 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select accident_id, count(*), avg(damage)
+from   accident
+group by accident_id
+having avg(damage) &gt;= all (select avg(damage)
+                          from   accident
+                          group by accident_id)</pre>
+      <p>בשיעור 4 כבר ידענו לחשב לכל תאונה את מספר הרכבים (<code>count(*)</code>) ואת הנזק הממוצע (<code>avg(damage)</code>). היום הוספנו את שלב ה"הכי": <code>having avg(damage) &gt;= all (אותו avg לכל התאונות)</code> — משאיר רק את התאונה שהממוצע שלה הגבוה ביותר.</p>
+      <p style="margin:10px 0 2px"><b>שימו לב לשתי המלכודות:</b></p>
+      <ul style="margin:0">
+        <li>אי אפשר <code>max(avg(damage))</code> — אסור לקנן פונקציות הקבצה.</li>
+        <li>צריך להחזיר גם <code>accident_id</code> ו‑<code>count(*)</code>, לא רק את המקסימום — ולכן תבנית ה‑<code>having ... &gt;= all</code> ולא תת‑שאילתה סקלרית בלבד.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. רוצים את ה<b>רכב</b> עם שנת הייצור הגבוהה ביותר (כל הפרטים). מה נכון?</div>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select max(year) from car</button>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">select * from car where year = (select max(year) from car)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select *, max(year) from car</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. למה <code>= (select max(year) from car)</code> עדיף על <code>select max(year)</code> לבד, כששואלים "מצא את הרכב"?</div>
+    <button class="opt" onclick="pick(this,1)">כי צריך להחזיר את כל שורת הרכב, לא רק את המספר המקסימלי</button>
+    <button class="opt" onclick="pick(this,0)">כי <code>max</code> לבד עובד רק על מספרים שליליים</button>
+    <button class="opt" onclick="pick(this,0)">אין הבדל, שתיהן זהות</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. איזו שאילתה <b>אסורה</b>?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">select brand, max(count(*)) from car group by brand</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select brand, count(*) from car group by brand having count(*) &gt;= all (select count(*) from car group by brand)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select * from car where year &gt;= all (select year from car)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. בשאלה 6.3 מצאנו את התאונה עם הנזק הממוצע הגבוה ביותר. מה תפקיד ה‑<code>having</code>?</div>
+    <button class="opt" onclick="pick(this,1)">לסנן ולהשאיר רק את הקבוצה (התאונה) שה‑<code>avg(damage)</code> שלה גדול‑או‑שווה לכל היתר</button>
+    <button class="opt" onclick="pick(this,0)">לסנן שורות לפני ההקבצה</button>
+    <button class="opt" onclick="pick(this,0)">למיין את התוצאה לפי נזק יורד</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">לא בטוח מתי <code>= max</code> ומתי <code>&gt;= all</code>? רוצה לראות מה קורה כשיש <b>תיקו</b> (שני רכבים מאותה שנה מקסימלית), או איך <code>not exists</code> מתנהג עם <code>null</code>? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>מה הלאה</h2>
+  <div class="next">
+    <b>שיעור 6 — צירוף חיצוני (outer join), קבוצות עם 0, ומיון (<code>order by</code>).</b> נשלים את שאלה 6.4: "לכל יצרן מספר התאונות, כולל יצרנים עם 0 תאונות, ממוין מהגבוה לנמוך".
+    <br><span style="font-size:14px; color:var(--muted)">(שאלה 6.5 — "פחות תאונות ב‑2024 מאשר ב‑2023" — היא השוואה בין שתי קבוצות זמן, ותגיע בשיעור ההשוואה החוצה‑קבוצתית בהמשך.)</span>
+  </div>
+</section>
+
+<footer>
+  שיעור 5 · קורס 131112 · מבוסס על <code>src/תאור שפת SQL.pdf</code> (תת‑שאילתות, <code>some</code>/<code>all</code>) ושאלה 6.3 מהבחינה<br>
+  לפתיחה: <code>open lessons/0005-max-min-highest.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>

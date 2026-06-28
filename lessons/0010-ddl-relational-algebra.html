@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>שיעור 10 · חלק א' של המבחן — DDL ואלגברה יחסית</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  pre.bad{border-right-color:var(--danger); background:#fdf3f1}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .warn{background:var(--danger-soft); border:1px solid #f1c0b8; border-radius:12px; padding:13px 18px; margin:14px 0; color:#8e2a20}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; direction:ltr; justify-content:center; margin:14px 0}
+  .flow .t{background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; padding:5px 12px; font-weight:700; font-family:ui-monospace,Menlo,monospace; font-size:14px}
+  .flow .ar{color:var(--muted)}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .ask{background:linear-gradient(135deg,#0b8457,#13a06b); color:#fff; border-radius:14px; padding:18px 22px; margin-top:8px}
+  .ask b{font-size:18px}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 10 · חלק א' של המבחן — DDL ואלגברה יחסית</div>
+  <h1>הגדרת טבלאות (DDL) ו‑SQL ↔ אלגברה יחסית</h1>
+  <p>השיעור האחרון, והוא שונה: כאן לא כותבים שאילתות גדולות אלא עונים על שאלות <b>חלק א'</b> של המבחן — שאלות <b>בחירה (MCQ)</b> ומושגיות. שני נושאים: (א) <b>הגדרת טבלה</b> עם מפתח ראשי, מפתח זר, פעולות שמירת קישור (<code>on delete cascade</code>/<code>set null</code>) ואילוצי <code>assertion</code>/<code>check</code>; (ב) לקרוא ביטוי ב<b>אלגברת היחסים</b> (σ π ⋈ × − ÷ ρ), לזהות את ה‑SQL השקול לו ולהפך, ולתרגם RA→SQL.</p>
+  <div class="goal">🎯 <b>היעד:</b> לקרוא נכון משפט <code>create table</code> ולדעת מה הוא מבטיח; להבין ש‑<code>on delete cascade</code> זורם <b>מהאב לבן</b> בלבד; לזהות באיזו תשובה ביטוי RA שקול לשאילתת SQL נתונה (וההפך) — ולענות נכון על שאלות חלק א' Q6 ו‑Q4 של המבחן.</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה (שיעורים 1–9):</b> שליפה, צירופים, <code>like</code>, הקבצה, MAX/MIN, צירוף חיצוני, תת‑שאילתות, חלוקה ("לכל"), וספירה/השוואה. אלו שאלות <b>חלק ב'</b> — כתיבת שאילתות. עכשיו סוגרים את הקורס עם <b>חלק א'</b>: שאלות תיאוריה ו‑MCQ על DDL ואלגברה יחסית. כל מה שלמדנו על σ/π/⋈/− חוזר כאן, הפעם בכיוון ההפוך — מ‑SQL לאלגברה.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמות שנעבוד עליהן</h2>
+  <p>לתרגול ה‑SQL החי נשתמש בסכמת <b>חברת ביטוח הרכב</b> (מפתח ראשי <u>בקו תחתון</u>):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>street</code>, <code>city</code>, <code>birth</code></td></tr>
+    <tr><td><code>owns</code></td><td><u><code>id</code>, <code>license</code></u></td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+  </table>
+  <p style="margin:6px 0 0; color:var(--muted)">סכמה מלאה ב‑<a href="../reference/glossary.html#schemas">מילון המונחים והסכמות ←</a>. בשאלות חלק א' של המבחן מופיעות גם סכמות <b>מופשטות</b> — יחסים בשמות כמו <code>r</code>(<code>A,B,C</code>) ו‑<code>s</code>(<code>C,D,E</code>), או <code>task</code>/<code>mech</code> — שעליהן אי אפשר "להריץ" כי אין להן נתונים; אותן פותרים בראש (MCQ).</p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>DDL — הגדרת טבלה: <code>create table</code></h2>
+  <p>עד כה רק <b>שלפנו</b> מטבלאות קיימות. <b>DDL</b> (Data Definition Language) זה איך <b>מגדירים</b> את הטבלה מלכתחילה — שם, עמודות, טיפוסים, ואילוצי שלמות. הצורה (מצגת תיכון בסיסי נתונים, פרק 4 — שלמות קישור):</p>
+  <pre class="sql">create table customer
+  (customer_name  char(20) not null,
+   street         char(30),
+   customer_city  char(30),
+   primary key    (customer_name))</pre>
+  <p>כל שורה היא עמודה: <b>שם</b> + <b>טיפוס</b> (למשל <code>char(20)</code>, <code>integer</code>, <code>date</code>). <code>not null</code> אוסר ערך ריק בעמודה. בסוף נכתבים <b>אילוצי המפתח</b>.</p>
+  <table>
+    <tr><th>טיפוס</th><th>משמעות</th></tr>
+    <tr><td><code>char(n)</code></td><td>מחרוזת באורך עד <code>n</code> תווים.</td></tr>
+    <tr><td><code>integer</code> · <code>smallint</code></td><td>מספר שלם.</td></tr>
+    <tr><td><code>numeric(p,s)</code> · <code>real</code></td><td>מספר עם נקודה עשרונית.</td></tr>
+    <tr><td><code>date</code></td><td>תאריך.</td></tr>
+    <tr><td><code>not null</code></td><td>מניעת ערך דמה (<code>null</code>) בעמודה זו.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="step">2</span>מפתח ראשי ומפתח זר</h2>
+  <p><b>מפתח ראשי</b> (<code>primary key</code>) — עמודה (או צירוף עמודות) שמזהה כל שורה <b>ביחידות</b>. כל עמודה ששייכת למפתח קביל היא אוטומטית <code>not null</code> (מצגת פרק 4).</p>
+  <p><b>מפתח זר</b> (<code>foreign key</code>) — עמודה בטבלה שלנו ש<b>מצביעה</b> על מפתח (קביל) בטבלה אחרת. הוא מבטיח <b>שלמות קישור</b> (referential integrity): לא תהיה שורה "<b>מדולדלת</b>" (dangling) שמצביעה על מישהו שלא קיים. דוגמה מלאה:</p>
+  <pre class="sql">create table deposit
+  (branch_name     char(15),
+   account_number  char(10) not null,
+   customer_name   char(20) not null,
+   balance         integer,
+   primary key (account_number, customer_name),
+   foreign key (branch_name)   references branch,
+   foreign key (customer_name) references customer)</pre>
+  <p>שתי השורות האחרונות אומרות: לכל ערך ב‑<code>branch_name</code> <b>חייב</b> להתקיים סניף תואם בטבלת <code>branch</code>, ולכל <code>customer_name</code> חייב להתקיים לקוח ב‑<code>customer</code>. אם תנסה להכניס שורה עם <code>branch_name</code> שלא קיים ב‑<code>branch</code> — ההכנסה <b>תידחה</b>.</p>
+  <div class="note">💡 בכתיב המלא כותבים גם את עמודת היעד: <code>foreign key (proj_no) references mech (proj_no)</code> — "העמודה <code>proj_no</code> שלי מצביעה על העמודה <code>proj_no</code> בטבלה <code>mech</code>". כשהשם זהה אפשר לקצר, אבל המבחן לרוב מציג את הכתיב המלא.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>⭐ פעולות שמירת קישור: <code>on delete cascade</code> / <code>set null</code></h2>
+  <p>מה קורה כש<b>מוחקים</b> שורה מ<b>טבלת האב</b> (הטבלה שאליה המפתח הזר מצביע), בזמן שיש <b>שורות בן</b> שמצביעות עליה? בלי הוראה — המחיקה <b>תידחה</b> (כדי לא ליצור שורות מדולדלות). אפשר לבקש התנהגות אחרת:</p>
+  <table>
+    <tr><th>הוראה</th><th>מה קורה בעת מחיקת שורת האב</th></tr>
+    <tr><td><code>on delete cascade</code></td><td>כל שורות <b>הבן</b> שמצביעות על האב <b>נמחקות גם הן</b> (מחיקה "מתגלגלת").</td></tr>
+    <tr><td><code>on delete set null</code></td><td>בשורות הבן, עמודת המפתח הזר מתעדכנת ל‑<code>null</code> (השורות נשארות, רק מאבדות את הקישור).</td></tr>
+  </table>
+  <p>נניח שהגדרנו בטבלת <code>task</code> (הבן):</p>
+  <pre class="sql">foreign key (proj_no) references mech (proj_no) on delete cascade</pre>
+  <p>כאן <code>mech</code> הוא <b>האב</b> (הטבלה המוצבעת), ו‑<code>task</code> הוא <b>הבן</b> (הטבלה עם המפתח הזר). <code>on delete cascade</code> אומר: כשמוחקים שורה מ‑<code>mech</code>, כל שורות <code>task</code> שהצביעו עליה נמחקות.</p>
+  <div class="warn">⚠️ <b>הכיווניות היא מלכודת הבחינה (Q6):</b> <code>cascade</code> זורם <b>מהאב (<code>mech</code>) אל הבן (<code>task</code>)</b> בלבד — לעולם לא הפוך. מחיקת שורה מ‑<code>task</code> <b>לא</b> מוחקת דבר מ‑<code>mech</code> (אין שום סיבה: <code>mech</code> לא מצביע על <code>task</code>). זכרו: המחיקה מתגלגלת מהמוצבע אל המצביע.</div>
+  <p style="margin:6px 0 0; color:var(--muted)">הערה: <code>create table</code> עם שם טבלה <b>חדש</b> רץ במנוע (▶) ומחזיר "✓ בוצע". <code>on delete cascade</code>, <code>create assertion</code> ו‑<code>check</code> אינם נתמכים במנוע — לכן בשיעור הם מסומנים בלי כפתור הרצה.</p>
+</section>
+
+<section>
+  <h2><span class="step">4</span>אילוצי <code>check</code> ו‑<code>create assertion</code></h2>
+  <p>מעבר למפתחות, אפשר לאכוף <b>חוקים כלליים</b> על הנתונים. <code>create assertion N check (Ψ)</code> יוצר הצהרה בשם <code>N</code> ש<b>מבטיחה</b> את התנאי <code>Ψ</code> בכל רגע (מצגת בקרת שלמות הנתונים — אכיפת שלמות נתונים ב‑SQL). הטריק הקבוע: כותבים את התנאי כ‑"<b>לא קיימת</b> שורה שמפרה אותו" — <code>not exists (...)</code>.</p>
+
+  <h3>דוגמה 1 — "נכסי כל הסניפים ידועים" (אין <code>null</code>)</h3>
+  <pre class="sql" data-norun>create assertion assets1
+check ( not exists
+        ( select * from branch
+          where assets is null ))</pre>
+  <p>קוראים: "ההצהרה תקפה כל עוד <b>לא קיים</b> סניף שה‑<code>assets</code> שלו <code>null</code>". זה בדיוק כמו <code>not null</code> על העמודה — אבל מנוסח כאילוץ גלובלי.</p>
+
+  <h3>דוגמה 2 — אכיפת תלות פונקציונלית <code>city → branch_name</code></h3>
+  <pre class="sql" data-norun>create assertion assets2
+check ( not exists
+        ( select city from branch
+          group by city
+          having count(distinct branch_name) &gt; 1 ))</pre>
+  <p>"לא קיימת עיר שיש בה יותר מסניף אחד" — בדיוק האכיפה של "עיר קובעת סניף יחיד". שימו לב לתבנית: ההפרה (עיר עם &gt;1 סניף) נתפסת ב‑<code>group by ... having count(...) &gt; 1</code>, וה‑<code>not exists</code> דורש שהיא לא תתרחש.</p>
+
+  <h3>דוגמה 3 — "סך ההלוואות בסניף אינו עולה על סך היתרות"</h3>
+  <pre class="sql" data-norun>create assertion sum_constraint
+check ( not exists
+        ( select * from branch
+          where ( select sum(amount)  from borrow
+                  where borrow.branch_name  = branch.branch_name )
+              &gt; ( select sum(balance) from deposit
+                  where deposit.branch_name = branch.branch_name ) ))</pre>
+  <p>"לא קיים סניף שבו סך ההלוואות גדול מסך היתרות". כל אילוץ <code>assertion</code> בנוי כך: <b>נסחו את ההפרה כשאילתה, ועטפו ב‑<code>not exists</code></b>.</p>
+  <div class="note">💡 <code>check</code> אפשר לכתוב גם <b>בתוך</b> הגדרת טבלה (אילוץ על שורה בודדת, למשל <code>check (age &gt;= 18)</code>), אבל <code>create assertion</code> הוא אילוץ <b>גלובלי</b> שיכול לערב <b>כמה טבלאות</b> (כמו דוגמה 3). <code>drop assertion N</code> מוחק את האכיפה.</div>
+</section>
+
+<section>
+  <h2><span class="step">5</span>אלגברה יחסית — מילון האופרטורים</h2>
+  <p>אלגברת היחסים היא ה"מתמטיקה" שמאחורי SQL. כל ביטוי בה ניתן לתרגום ל‑SQL ולהפך. אלו האופרטורים שתפגשו בחלק א' (מצגת תיאור שפת SQL, פרק 3):</p>
+  <table>
+    <tr><th>סימן</th><th>שם</th><th>מה עושה</th><th>ב‑SQL</th></tr>
+    <tr><td style="direction:ltr; text-align:center">σ</td><td>בחירה (selection)</td><td>סינון <b>שורות</b> לפי תנאי</td><td><code>where</code></td></tr>
+    <tr><td style="direction:ltr; text-align:center">π</td><td>הטלה (projection)</td><td>בחירת <b>עמודות</b> (ומסיר כפילויות)</td><td><code>select distinct</code></td></tr>
+    <tr><td style="direction:ltr; text-align:center">×</td><td>מכפלה קרטזית</td><td>כל שילוב שורות משתי טבלאות</td><td><code>from a, b</code></td></tr>
+    <tr><td style="direction:ltr; text-align:center">⋈</td><td>צירוף טבעי (join)</td><td>חיבור לפי עמודות <b>בעלות שם משותף</b></td><td><code>natural join</code> / <code>join ... on</code></td></tr>
+    <tr><td style="direction:ltr; text-align:center">−</td><td>הפרש (difference)</td><td>שורות שב‑a ו<b>אינן</b> ב‑b</td><td><code>not in</code> / <code>not exists</code> / <code>except</code></td></tr>
+    <tr><td style="direction:ltr; text-align:center">∪</td><td>איחוד (union)</td><td>שורות שב‑a <b>או</b> ב‑b</td><td><code>union</code></td></tr>
+    <tr><td style="direction:ltr; text-align:center">÷</td><td>חילוק (division)</td><td>"לכל" — מי שמתאים ל<b>כל</b> ערכי b</td><td><code>not exists ... not exists</code> (שיעור 8)</td></tr>
+    <tr><td style="direction:ltr; text-align:center">ρ</td><td>שינוי שם (rename)</td><td>כינוי לטבלה/עמודה — מאפשר צירוף‑עצמי</td><td><code>as</code> (alias)</td></tr>
+  </table>
+  <p>הקשר הבסיסי שכבר ראינו במילון: שאילתת SQL בסיסית <code>select A from r where c</code> שקולה בדיוק ל‑<code>π<sub>A</sub>(σ<sub>c</sub>(r))</code>.</p>
+  <div class="flow">
+    <span class="t">σ → where</span><span class="ar">·</span>
+    <span class="t">π → select distinct</span><span class="ar">·</span>
+    <span class="t">⋈ → natural join</span><span class="ar">·</span>
+    <span class="t">− → not in / except</span>
+  </div>
+</section>
+
+<section>
+  <h2><span class="step">6</span>תרגום RA → SQL (ולהפך)</h2>
+  <p>הכלל: קוראים את הביטוי <b>מבפנים החוצה</b>. כל <code>σ</code> הופך ל‑<code>where</code>, כל <code>π</code> ל‑<code>select</code>, כל <code>⋈</code> ל‑<code>join</code>, וכל <code>−</code> ל‑<code>not in</code> / <code>not exists</code>. דוגמה פשוטה (סכמת ביטוח הרכב):</p>
+  <p style="direction:ltr; text-align:center"><code>π<sub>fname,lname</sub> ( σ<sub>city='Haifa'</sub> ( person ) )</code></p>
+  <p>קוראים: סנן (<code>σ</code>) את <code>person</code> לעיר Haifa, ואז הטל (<code>π</code>) את העמודות <code>fname</code>, <code>lname</code>:</p>
+  <pre class="sql">select fname, lname
+from   person
+where  city = 'Haifa'</pre>
+
+  <h3>עם צירוף וחיסור</h3>
+  <p>הביטוי שראינו בשיעור 7 (השאלה ממבחן 2023): <code>π<sub>damage</sub>(Accident) − π<sub>damage</sub>(σ<sub>a2.damage&gt;a1.damage</sub>(Accident × ρ<sub>a2</sub>(Accident)))</code> — "כל הנזקים פחות כל נזק שיש מעליו נזק גדול יותר" = הנזק <b>הגבוה ביותר</b>. החיסור (<code>−</code>) הופך ל‑<code>not exists</code>/<code>not in</code>, וה‑<code>ρ</code> הוא הכינוי לצירוף‑עצמי. (השלמנו שם את התרגום; כאן רק נזכיר את הכיוון.)</p>
+  <div class="note">💡 <code>−</code> (הפרש) הוא הלב של שאלות "שלא"/"שאין": <code>Π<sub>A</sub>(r) − Π<sub>A</sub>(σ<sub>c</sub>(...))</code> = "כל ה‑A, פחות ה‑A שמקיימים את <code>c</code>" = "ה‑A ש<b>לא</b> מקיימים <code>c</code>" ⟵ <code>where A not in (select A ... where c)</code>. את התבנית הזו פוגשים ב‑Q4 של המבחן.</div>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלה שבמבחנים. השאלות החיות (RA→SQL) נבדקות אוטומטית על סכמת הביטוח; שאלות ה‑MCQ והסכמות המופשטות (<code>r,s</code> / <code>task,mech</code>) — נפתרות בראש.</p>
+
+  <h3>חימום ותרגול</h3>
+  <div class="ex">
+    <div class="task">תרגיל 1 (RA → SQL, חי) — תרגמו לשאילתת SQL את הביטוי הבא והריצו אותה:
+      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">π fname,lname ( σ city='Haifa' ( person ) )</pre>
+    </div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select fname, lname
+from   person
+where  city = 'Haifa'</pre>
+      <p><code>σ</code> = ה‑<code>where</code>, <code>π</code> = ה‑<code>select</code>. מבפנים החוצה: קודם הסינון, ואז בחירת העמודות. (בנתוני הדוגמה מוחזרות 6 שורות.)</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 (RA → SQL, חי — צירוף) — תרגמו לשאילתת SQL את הביטוי, והריצו. (<code>person ⋈ owns ⋈ car</code> = צירוף טבעי לאורך <code>id</code> ואז <code>license</code>.)
+      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">π fname,lname ( σ brand='Tesla' ( person ⋈ owns ⋈ car ) )</pre>
+    </div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select fname, lname
+from   person join owns on person.id = owns.id
+             join car  on owns.license = car.license
+where  car.brand = 'Tesla'</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם צירוף טבעי / פסיק ו‑where:</p>
+      <pre class="sql">select fname, lname
+from   person, owns, car
+where  person.id = owns.id
+  and  owns.license = car.license
+  and  car.brand = 'Tesla'</pre>
+      <p>כל <code>⋈</code> הוא <code>join ... on</code> לאורך העמודה המשותפת, וה‑<code>σ</code> הוא ה‑<code>where</code>. (בנתוני הדוגמה מוחזרות 4 שורות.)</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 (DDL, חי) — כתבו <code>create table</code> ליחס חדש בשם <code>project</code> עם העמודות <code>proj_no</code> (<code>integer</code>, מפתח ראשי), <code>pname</code> (<code>char(40)</code>, חובה), ו‑<code>budget</code> (<code>integer</code>). הריצו — אמורים לקבל "✓ בוצע".</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="create table ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">create table project
+  (proj_no  integer,
+   pname    char(40) not null,
+   budget   integer,
+   primary key (proj_no))</pre>
+      <p>טיפוס לכל עמודה, <code>not null</code> ל‑<code>pname</code>, והמפתח הראשי בסוף. שם הטבלה חדש (לא מהסכמה) — לכן רץ במנוע ומחזיר "בוצע".</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 4 (מפתח זר — קריאה) — נתון: <code>foreign key (garage_id) references garage (garage_id) on delete set null</code> בטבלת <code>accident</code>. מה קורה כשמוחקים מוסך מטבלת <code>garage</code> שטיפל ב‑3 תאונות?</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">(שאלת קריאה — אין צורך להריץ.)</p>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <p>שלוש שורות התאונה <b>לא נמחקות</b> — אבל עמודת <code>garage_id</code> שלהן הופכת ל‑<code>null</code> ("התאונה קיימת, אך כרגע לא משויכת לאף מוסך"). אם זה היה <code>on delete cascade</code> — שלוש התאונות היו נמחקות. אם לא הייתה הוראה כלל — מחיקת המוסך הייתה <b>נדחית</b> כל עוד יש תאונות שמצביעות עליו.</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <p style="margin-top:0; color:var(--muted)">עכשיו ברמת הבחינה — אלו שאלות חלק א' MCQ אמיתיות. היעזרו ב‑<a href="../reference/glossary.html#schemas">מילון הסכמות</a> אם צריך.</p>
+
+  <div class="ex" id="q6">
+    <div class="task">🎓 תרגיל 5 (Q6) — בהגדרת SQL של יחס בשם <code>task</code> מופיעה השורה הבאה:
+      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">foreign key (proj_no) references mech (proj_no) on delete cascade</pre>
+      איזה מהמשפטים הבאים <b>אינו נכון</b>?
+    </div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 2 · מועד 1 (קובץ <code>…_16208</code>) · חלק א' שאלה 6</p>
+    <button class="opt" onclick="pick(this,0)">א. בעת מחיקת שורה מהיחס <code>mech</code>, יימחקו כל השורות מהיחס <code>task</code> הקשורות אליה.</button>
+    <button class="opt" onclick="pick(this,1)">ב. בעת מחיקת שורה מהיחס <code>task</code>, יימחקו כל השורות מהיחס <code>mech</code> הקשורות אליה.</button>
+    <button class="opt" onclick="pick(this,0)">ג. התכונה <code>proj_no</code> ביחס <code>mech</code> היא מפתח קביל (או בהכרח חלק ממפתח).</button>
+    <button class="opt" onclick="pick(this,0)">ד. אם תוזן ל‑<code>task</code> שורה שערך התכונה <code>proj_no</code> בה אינו שייך לקבוצה <code>Π<sub>proj_no</sub>(mech)</code> — ההזנה תידחה.</button>
+    <div class="fb"></div>
+    <button class="reveal-btn" onclick="toggle(this)" style="margin-top:10px">הצג הסבר</button>
+    <div class="solution">
+      <p><b>התשובה הלא נכונה היא ב'.</b> <code>on delete cascade</code> זורם <b>מהאב (<code>mech</code>, המוצבע) אל הבן (<code>task</code>, המצביע)</b> — מחיקת שורה מ‑<code>mech</code> מוחקת את שורות <code>task</code> התלויות (כך א' <b>נכון</b>). אבל הכיוון ההפוך לא קיים: מחיקת שורה מ‑<code>task</code> <b>לא</b> משפיעה על <code>mech</code> (אין סיבה — <code>mech</code> לא מצביע על <code>task</code>). לכן ב' <b>שגוי</b>.</p>
+      <p>הסבר על השאר: <b>ג' נכון</b> — העמודה <code>proj_no</code> ב‑<code>mech</code> חייבת להיות מפתח קביל, כי מפתח זר יכול להצביע רק על מפתח קביל. <b>ד' נכון</b> — זו בדיוק שלמות הקישור: לא ניתן להכניס ל‑<code>task</code> ערך <code>proj_no</code> שלא קיים ב‑<code>mech</code>, אחרת תיווצר שורה מדולדלת.</p>
+    </div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">🎓 תרגיל 6 (Q4) — נתונים שני יחסים <code>r</code> ו‑<code>s</code> בעלי תבניות <code>R=(A,B,C)</code> ו‑<code>S=(C,D,E)</code> בהתאמה (תחום כל התכונות <code>integer</code>). נתונה השאילתה:
+      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">select distinct A
+from   r
+where  A not in (select A
+                 from   r natural inner join s
+                 where  E &gt; 3)</pre>
+      איזו מהתשובות הבאות (באלגברת היחסים) <b>שקולה</b> לה?
+    </div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 2 · מועד 1 (קובץ <code>…_16208</code>) · חלק א' שאלה 4. (סכמה מופשטת → MCQ, לא ניתן להריץ.)</p>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">א. Π<sub>A</sub>(r) − Π<sub>A</sub>( Π<sub>A,C</sub>(r) ⋈ σ<sub>E&gt;3</sub>(s) )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">ב. Π<sub>A</sub>( r ⋈ σ<sub>E&gt;3</sub>(s) )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">ג. Π<sub>A,C</sub>(r) ÷ Π<sub>C</sub>( σ<sub>E&gt;3</sub>(s) )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">ד. Π<sub>A</sub>(r) − Π<sub>A</sub>( σ<sub>E&gt;3</sub>(s) )</button>
+    <div class="fb"></div>
+    <button class="reveal-btn" onclick="toggle(this)" style="margin-top:10px">הצג הסבר</button>
+    <div class="solution">
+      <p><b>התשובה הנכונה היא א'.</b> פירוק השאילתה:</p>
+      <ul style="margin:0">
+        <li>תת‑השאילתה הפנימית: <code>select A from r natural inner join s where E&gt;3</code> = <code>Π<sub>A</sub>( σ<sub>E&gt;3</sub>(r ⋈ s) )</code> — ערכי ה‑<code>A</code> שמשתתפים בצירוף עם שורת <code>s</code> שבה <code>E&gt;3</code>.</li>
+        <li>החיצונית: <code>distinct A</code> מ‑<code>r</code> ש‑<code>A</code> שלהם <b>אינו</b> בקבוצה הזו ⟵ <b>חיסור</b>: <code>Π<sub>A</sub>(r) − Π<sub>A</sub>( σ<sub>E&gt;3</sub>(r ⋈ s) )</code>.</li>
+      </ul>
+      <p>תשובה א' מנסחת בדיוק את החלק השני: <code>Π<sub>A,C</sub>(r) ⋈ σ<sub>E&gt;3</sub>(s)</code> — הצירוף הטבעי הוא לאורך <code>C</code> (התכונה המשותפת היחידה), והטלת <code>r</code> מראש ל‑<code>A,C</code> לא משנה אילו ערכי <code>A</code> שורדים (העמודה <code>B</code> כלל לא משתתפת בצירוף או בסינון). לכן <code>Π<sub>A</sub>(Π<sub>A,C</sub>(r) ⋈ σ<sub>E&gt;3</sub>(s)) = Π<sub>A</sub>(σ<sub>E&gt;3</sub>(r ⋈ s))</code>, וכל הביטוי שקול לשאילתה.</p>
+      <p>למה השאר שגויות:</p>
+      <ul style="margin:0">
+        <li><b>ב'</b> נותנת את הקבוצה ה<b>חיובית</b> (ה‑<code>A</code> ש<b>כן</b> בצירוף) — בדיוק ההיפך מ‑<code>not in</code>.</li>
+        <li><b>ד'</b> כותבת <code>Π<sub>A</sub>(σ<sub>E&gt;3</sub>(s))</code> — אבל ל‑<code>s</code> אין עמודה <code>A</code> כלל, אז ההטלה הזו אינה חוקית/אינה מה שהשאילתה עושה.</li>
+        <li><b>ג'</b> היא חילוק (÷ = "לכל"), ואילו השאילתה היא חיסור (<code>not in</code>) — סוג שונה לגמרי.</li>
+      </ul>
+      <p style="margin:10px 0 2px"><b>הקשר לשיעור:</b> <code>not in (subquery)</code> ⟷ <code>−</code> (הפרש), <code>natural inner join</code> ⟷ <code>⋈</code>, <code>where E&gt;3</code> ⟷ <code>σ<sub>E&gt;3</sub></code>. זיהוי שלושת אלו מוביל ישר לתשובה א'.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="c1">
+    <div class="task">1. בטבלה <code>task</code> מוגדר <code>foreign key (proj_no) references mech (proj_no)</code> <b>בלי</b> שום הוראת <code>on delete</code>. מנסים למחוק שורה מ‑<code>mech</code> שיש לה שורות <code>task</code> שמצביעות עליה. מה קורה?</div>
+    <button class="opt" onclick="pick(this,1)">המחיקה <b>נדחית</b> — אסור ליצור שורות מדולדלות ב‑<code>task</code>.</button>
+    <button class="opt" onclick="pick(this,0)">שורות <code>task</code> נמחקות אוטומטית (cascade ברירת מחדל).</button>
+    <button class="opt" onclick="pick(this,0)">עמודת <code>proj_no</code> ב‑<code>task</code> הופכת ל‑<code>null</code>.</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="c2">
+    <div class="task">2. איזה אופרטור באלגברה יחסית שקול ל‑<code>not in (subquery)</code> / "שאין / שלא"?</div>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">⋈ (natural join)</button>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">− (difference)</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">÷ (division)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="c3">
+    <div class="task">3. השאילתה <code>select distinct fname from person where city = 'Haifa'</code> שקולה לאיזה ביטוי?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">π<sub>fname</sub>( σ<sub>city='Haifa'</sub>(person) )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">σ<sub>fname</sub>( π<sub>city='Haifa'</sub>(person) )</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">π<sub>city='Haifa'</sub>(person)</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="c4">
+    <div class="task">4. מה <b>חייב</b> להתקיים בעמודת היעד שאליה מצביע מפתח זר (למשל <code>proj_no</code> ב‑<code>mech</code>)?</div>
+    <button class="opt" onclick="pick(this,1)">להיות מפתח <b>קביל</b> (candidate key) בטבלת היעד.</button>
+    <button class="opt" onclick="pick(this,0)">להיות מסוג <code>char</code> דווקא.</button>
+    <button class="opt" onclick="pick(this,0)">להיות מוגדרת <code>null</code> מותר.</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="c5">
+    <div class="task">5. <code>create assertion N check (Ψ)</code> — מהי התבנית הקבועה לכתיבת התנאי <code>Ψ</code>?</div>
+    <button class="opt" onclick="pick(this,1)">לנסח את <b>ההפרה</b> כשאילתה ולעטוף ב‑<code>not exists (...)</code>.</button>
+    <button class="opt" onclick="pick(this,0)">לכתוב תמיד <code>select count(*) = 0</code>.</button>
+    <button class="opt" onclick="pick(this,0)">אפשר רק <code>check (column &gt; value)</code>, בלי תת‑שאילתות.</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <div class="ask">
+    <b>אני המורה שלך — תשאל! 🙋</b>
+    <p style="margin:6px 0 0">לא בטוח בכיוון של <code>cascade</code> (אב→בן)? רוצה שנעבור יחד על תרגום RA→SQL של ביטוי עם <code>÷</code> או <code>×</code>, או על עוד דוגמת <code>create assertion</code>? כתוב לי בצ'אט.</p>
+  </div>
+</section>
+
+<section>
+  <h2>סיימת את הקורס 🎉</h2>
+  <div class="next">
+    <b>זהו — עברת את כל עשרת השיעורים!</b> מ‑<code>select</code> בסיסי (שיעור 1), דרך צירופים, <code>like</code>, הקבצה, MAX/MIN, צירוף חיצוני, תת‑שאילתות, חלוקה ("לכל"), ספירה והשוואה — ועד חלק א' של המבחן (DDL + אלגברה יחסית). יש לך עכשיו את כל הכלים לפתור <b>כל שאלה</b> בבחינות 131112.
+    <br><br><b>הצעד הבא — פתרון מבחנים מלאים:</b> פתחו את התיקייה <code>test/</code> ופתרו מבחן שלם מתחילתו ועד סופו, בלי הצצה. התחילו ב‑<code>…_12364</code> (2025·ס1·מ1) או ב‑<code>…_16208</code> (2023·ס2·מ1, זה שממנו לקוחות Q4 ו‑Q6 כאן). כל שאלה שתיתקעו בה — חזרו לשיעור המתאים (המיפוי שאלה→שיעור מופיע ב‑<code>HANDOFF.md</code>), או שאלו אותי בצ'אט.
+    <br><span style="font-size:14px; color:var(--muted)">טיפ: פתרו תחת שעון (3 שעות, כמו במבחן האמיתי), וכתבו SQL "על נייר" לפני שמריצים — בדיוק כמו בתנאי הבחינה.</span>
+  </div>
+</section>
+
+<footer>
+  שיעור 10 (אחרון) · קורס 131112 · מבוסס על <code>src/בקרת שלמות הנתונים.pdf</code> (פרק 4 — <code>create table</code>, מפתחות, <code>create assertion</code>/<code>check</code>) ו‑<code>src/תאור שפת SQL.pdf</code> (אלגברה יחסית), ושאלות חלק א' של מבחן 2023·ס"ב·מ"א (<code>…_16208</code>) ש'4 ו‑ש'6<br>
+  לפתיחה: <code>open lessons/0010-ddl-relational-algebra.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (static highlight + practice-box mode toggle) handled by ../assets/sql-blocks.js
+</script>
+</body>
+</html>
