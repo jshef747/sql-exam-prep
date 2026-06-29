@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem('sqlTheme');if(!t&&typeof window.name=='string'&&window.name.indexOf('SQLBOXES:')===0){t=(JSON.parse(window.name.slice(9))||{}).__theme;}if(t==='dark'){document.documentElement.className+=' dark';}}catch(e){}</script>
+<link rel="stylesheet" href="../assets/dark.css">
 <title>שיעור 10 · חלק א' של המבחן — DDL ואלגברה יחסית</title>
 <style>
   :root{
@@ -231,60 +233,65 @@ where  city = 'Haifa'</pre>
 
   <h3>חימום ותרגול</h3>
   <div class="ex">
-    <div class="task">תרגיל 1 (RA → SQL, חי) — תרגמו לשאילתת SQL את הביטוי הבא והריצו אותה:
-      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">π fname,lname ( σ city='Haifa' ( person ) )</pre>
+    <div class="task">תרגיל 1 (RA → SQL, חי) — תרגמו לשאילתת SQL את הביטוי הבא והריצו אותה. (כאן ה‑<code>π</code> בוחר <b>שתי</b> עמודות, וה‑<code>σ</code> מסנן לפי תנאי <b>מספרי</b>.)
+      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">π model,brand ( σ year &gt;= 2023 ( car ) )</pre>
     </div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select fname, lname
-from   person
-where  city = 'Haifa'</pre>
-      <p><code>σ</code> = ה‑<code>where</code>, <code>π</code> = ה‑<code>select</code>. מבפנים החוצה: קודם הסינון, ואז בחירת העמודות. (בנתוני הדוגמה מוחזרות 6 שורות.)</p>
+      <pre class="sql">select distinct model, brand
+from   car
+where  year &gt;= 2023</pre>
+      <p><code>σ</code> = ה‑<code>where</code> (הפעם השוואה מספרית <code>year &gt;= 2023</code>), <code>π</code> = ה‑<code>select</code> של שתי העמודות. <code>π</code> מסיר כפילויות, ולכן <code>distinct</code>. (בנתוני הדוגמה מוחזרות 7 שורות — דגמי הרכב משנת 2023 ואילך.)</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 2 (RA → SQL, חי — צירוף) — תרגמו לשאילתת SQL את הביטוי, והריצו. (<code>person ⋈ owns ⋈ car</code> = צירוף טבעי לאורך <code>id</code> ואז <code>license</code>.)
-      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">π fname,lname ( σ brand='Tesla' ( person ⋈ owns ⋈ car ) )</pre>
+    <div class="task">תרגיל 2 (RA → SQL, חי — צירוף) — תרגמו לשאילתת SQL את הביטוי, והריצו. (<code>garage ⋈ accident</code> = צירוף טבעי לאורך העמודה המשותפת היחידה <code>garage_id</code> — שמות המוסכים שטיפלו בתאונה.)
+      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">π garage_name ( σ city='Jaffa' ( garage ⋈ accident ) )</pre>
     </div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select fname, lname
-from   person join owns on person.id = owns.id
-             join car  on owns.license = car.license
-where  car.brand = 'Tesla'</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם צירוף טבעי / פסיק ו‑where:</p>
-      <pre class="sql">select fname, lname
-from   person, owns, car
-where  person.id = owns.id
-  and  owns.license = car.license
-  and  car.brand = 'Tesla'</pre>
-      <p>כל <code>⋈</code> הוא <code>join ... on</code> לאורך העמודה המשותפת, וה‑<code>σ</code> הוא ה‑<code>where</code>. (בנתוני הדוגמה מוחזרות 4 שורות.)</p>
+      <pre class="sql">select distinct garage_name
+from   garage join accident on garage.garage_id = accident.garage_id
+where  garage.city = 'Jaffa'</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select distinct garage_name
+from   garage, accident
+where  garage.garage_id = accident.garage_id
+  and  garage.city = 'Jaffa'</pre>
+      <p>ה‑<code>⋈</code> הוא <code>join ... on</code> לאורך <code>garage_id</code> (העמודה המשותפת היחידה לשתי הטבלאות), וה‑<code>σ</code> הוא ה‑<code>where</code>. <code>π</code> מסיר כפילויות (מוסך שטיפל בכמה תאונות יופיע פעם אחת) — לכן <code>distinct</code>. (בנתוני הדוגמה מוחזרות 2 שורות — המוסכים ב‑Jaffa.)</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 3 (DDL, חי) — כתבו <code>create table</code> ליחס חדש בשם <code>project</code> עם העמודות <code>proj_no</code> (<code>integer</code>, מפתח ראשי), <code>pname</code> (<code>char(40)</code>, חובה), ו‑<code>budget</code> (<code>integer</code>). הריצו — אמורים לקבל "✓ בוצע".</div>
+    <div class="task">תרגיל 3 (DDL, חי) — כתבו <code>create table</code> ליחס חדש בשם <code>department</code> עם העמודות <code>dept_no</code> (<code>integer</code>, מפתח ראשי), <code>dname</code> (<code>char(30)</code>, חובה), ו‑<code>manager_id</code> (<code>integer</code>). הריצו — אמורים לקבל "✓ בוצע".</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="create table ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">create table project
-  (proj_no  integer,
-   pname    char(40) not null,
-   budget   integer,
-   primary key (proj_no))</pre>
-      <p>טיפוס לכל עמודה, <code>not null</code> ל‑<code>pname</code>, והמפתח הראשי בסוף. שם הטבלה חדש (לא מהסכמה) — לכן רץ במנוע ומחזיר "בוצע".</p>
+      <pre class="sql">create table department
+  (dept_no     integer,
+   dname       char(30) not null,
+   manager_id  integer,
+   primary key (dept_no))</pre>
+      <p>טיפוס לכל עמודה, <code>not null</code> ל‑<code>dname</code>, והמפתח הראשי בסוף. שם הטבלה חדש (לא מהסכמה) — לכן רץ במנוע ומחזיר "בוצע".</p>
     </div>
   </div>
 
-  <div class="ex">
-    <div class="task">תרגיל 4 (מפתח זר — קריאה) — נתון: <code>foreign key (garage_id) references garage (garage_id) on delete set null</code> בטבלת <code>accident</code>. מה קורה כשמוחקים מוסך מטבלת <code>garage</code> שטיפל ב‑3 תאונות?</div>
+  <div class="ex" id="w4">
+    <div class="task">תרגיל 4 (מפתח זר — קריאה, MCQ) — בטבלת <code>owns</code> (הבן) מוגדר:
+      <pre class="sql" data-norun style="margin-top:8px; background:#f3f5f9">foreign key (id) references person (id) on delete cascade</pre>
+      מוחקים מטבלת <code>person</code> (האב) אדם אחד שבבעלותו 2 כלי רכב (כלומר יש לו 2 שורות ב‑<code>owns</code>). מה קורה?
+    </div>
     <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">(שאלת קריאה — אין צורך להריץ.)</p>
-    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <button class="opt" onclick="pick(this,1)">שתי שורות ה‑<code>owns</code> של אותו אדם <b>נמחקות גם הן</b> (המחיקה מתגלגלת מהאב לבן).</button>
+    <button class="opt" onclick="pick(this,0)">עמודת <code>id</code> בשתי שורות ה‑<code>owns</code> מתעדכנת ל‑<code>null</code>, והשורות נשארות.</button>
+    <button class="opt" onclick="pick(this,0)">מחיקת האדם <b>נדחית</b> כל עוד יש לו שורות ב‑<code>owns</code>.</button>
+    <div class="fb"></div>
+    <button class="reveal-btn" onclick="toggle(this)" style="margin-top:10px">הצג הסבר</button>
     <div class="solution">
-      <p>שלוש שורות התאונה <b>לא נמחקות</b> — אבל עמודת <code>garage_id</code> שלהן הופכת ל‑<code>null</code> ("התאונה קיימת, אך כרגע לא משויכת לאף מוסך"). אם זה היה <code>on delete cascade</code> — שלוש התאונות היו נמחקות. אם לא הייתה הוראה כלל — מחיקת המוסך הייתה <b>נדחית</b> כל עוד יש תאונות שמצביעות עליו.</p>
+      <p>עם <code>on delete cascade</code>, מחיקת שורת ה<b>אב</b> מ‑<code>person</code> מגלגלת מחיקה אל כל שורות ה<b>בן</b> ב‑<code>owns</code> שמצביעות עליה — לכן שתי שורות הבעלות <b>נמחקות</b>. השוו: אילו היה <code>on delete set null</code>, השורות היו נשארות ועמודת <code>id</code> שלהן הייתה הופכת ל‑<code>null</code>; ואילו <b>ללא</b> הוראת <code>on delete</code> כלל — מחיקת האדם הייתה <b>נדחית</b> כל עוד יש שורות <code>owns</code> שמצביעות עליו. (וזכרו את הכיווניות: מחיקה מ‑<code>owns</code> לעולם לא משפיעה על <code>person</code>.)</p>
     </div>
   </div>
 
@@ -398,6 +405,7 @@ where  A not in (select A
   <h2>סיימת את הקורס 🎉</h2>
   <div class="next">
     <b>זהו — עברת את כל עשרת השיעורים!</b> מ‑<code>select</code> בסיסי (שיעור 1), דרך צירופים, <code>like</code>, הקבצה, MAX/MIN, צירוף חיצוני, תת‑שאילתות, חלוקה ("לכל"), ספירה והשוואה — ועד חלק א' של המבחן (DDL + אלגברה יחסית). יש לך עכשיו את כל הכלים לפתור <b>כל שאלה</b> בבחינות 131112.
+    <br><br>📎 <b>נושא משלים:</b> יש גם <a href="0011-views.html">שיעור 11 — תצפיות (<code>create view</code>)</a>, שמופיע במבחן (שאלה 9.4 "הגדר תצפית").
     <br><br><b>הצעד הבא — פתרון מבחנים מלאים:</b> פתחו את התיקייה <code>test/</code> ופתרו מבחן שלם מתחילתו ועד סופו, בלי הצצה. התחילו ב‑<code>…_12364</code> (2025·ס1·מ1) או ב‑<code>…_16208</code> (2023·ס2·מ1, זה שממנו לקוחות Q4 ו‑Q6 כאן). כל שאלה שתיתקעו בה — חזרו לשיעור המתאים (המיפוי שאלה→שיעור מופיע ב‑<code>HANDOFF.md</code>), או שאלו אותי בצ'אט.
     <br><span style="font-size:14px; color:var(--muted)">טיפ: פתרו תחת שעון (3 שעות, כמו במבחן האמיתי), וכתבו SQL "על נייר" לפני שמריצים — בדיוק כמו בתנאי הבחינה.</span>
   </div>

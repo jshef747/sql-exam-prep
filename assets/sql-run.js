@@ -91,6 +91,17 @@
     return h + '</tbody></table><div class="sqlrun-msg">' + res.length + ' שורות</div>';
   }
 
+  // AlaSQL returns one result per statement; for a multi-statement box
+  // (e.g. `create view v as ... ; select * from v`) keep the LAST statement's
+  // result so the rendered table / verdict reflects the final SELECT.
+  function normalizeResult(res) {
+    if (Array.isArray(res) && res.length &&
+        res.some(function (e) { return Array.isArray(e) || typeof e !== 'object' || e === null; })) {
+      return res[res.length - 1];
+    }
+    return res;
+  }
+
   /* ---------- answer checking (compare to the model solution) ---------- */
   // Canonical form: multiset of rows, values by column position, names ignored,
   // row order ignored. So aliasing / row-order differences pass, but wrong
@@ -136,12 +147,12 @@
       btn.disabled = true; var label = btn.textContent; btn.textContent = '…';
       ensureEngine().then(function (alasql) {
         var schema = resolveSchema(block);
-        var res = execOn(alasql, schema, sql);
+        var res = normalizeResult(execOn(alasql, schema, sql));
         var verdict = '';
         var exp = expectedSQL(block);          // practice box -> auto-check vs model
         if (exp) {
           try {
-            var want = execOn(alasql, schema, exp), c1 = canon(res), c2 = canon(want);
+            var want = normalizeResult(execOn(alasql, schema, exp)), c1 = canon(res), c2 = canon(want);
             if (c1 !== null && c2 !== null) verdict = verdictHTML(c1 === c2, res.length, want.length);
           } catch (e) { /* model failed to run -> just show the result, no verdict */ }
         }

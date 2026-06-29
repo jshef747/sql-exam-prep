@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem('sqlTheme');if(!t&&typeof window.name=='string'&&window.name.indexOf('SQLBOXES:')===0){t=(JSON.parse(window.name.slice(9))||{}).__theme;}if(t==='dark'){document.documentElement.className+=' dark';}}catch(e){}</script>
+<link rel="stylesheet" href="../assets/dark.css">
+<title>שיעור 11 · תצפיות — create view</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#2b4a8b,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:26px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:29px}
+  header.top p{margin:0; opacity:.93}
+  .goal{background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin-top:16px; color:#0a5d3f}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:24px 28px; margin-bottom:20px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:23px}
+  h3{color:var(--primary); margin:20px 0 6px; font-size:18.5px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .recap{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:6px}
+  .ex textarea{width:100%; min-height:104px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px; font-size:15px; font-weight:600; margin-top:8px}
+  .reveal-btn{background:var(--primary); color:#fff}
+  .reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  .opt{display:block; width:100%; text-align:right; background:#fff; border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; margin:7px 0; font-size:15.5px; transition:.15s}
+  .opt:hover{border-color:var(--primary)}
+  .opt.correct{background:var(--accent-soft); border-color:var(--accent); color:#0a5d3f; font-weight:600}
+  .opt.wrong{background:var(--danger-soft); border-color:var(--danger); color:#8e2a20}
+  .fb{display:none; margin-top:10px; padding:10px 14px; border-radius:10px; font-size:15px}
+  .fb.show{display:block}
+  .fb.ok{background:var(--accent-soft); color:#0a5d3f}
+  .fb.no{background:var(--danger-soft); color:#8e2a20}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .next{background:var(--primary-soft); border:1px dashed #9db8e6; border-radius:12px; padding:14px 18px; color:var(--primary)}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 11 · תצפיות</div>
+  <h1>תצפיות · <code>create view</code></h1>
+  <p>תצפית (view) היא <b>שאילתה שמורה בשם</b> שמתנהגת כמו טבלה. כותבים פעם אחת שאילתה מורכבת, נותנים לה שם — ומאז שולפים ממנה כאילו הייתה טבלה רגילה. הבחינה לפעמים מבקשת במפורש "הגדר תצפית".</p>
+  <div class="goal">🎯 <b>היעד:</b> להגדיר תצפית עם <code>create view ... as</code>, לשלוף ממנה כמו מטבלה, ולבנות עליה שאילתות נוספות (סינון, מיון, הקבצה).</div>
+</header>
+
+<section>
+  <div class="recap">↩️ <b>עד כה</b> למדנו לכתוב שאילתות (שיעורים 1–10). תצפית פשוט נותנת לשאילתה <b>שם</b> ושומרת אותה לשימוש חוזר. אין כאן תחביר שליפה חדש — רק עטיפה.</div>
+</section>
+
+<section class="schema">
+  <h2>הסכמה שנעבוד עליה</h2>
+  <p>סכמת <b>חברת ביטוח הרכב</b> (אותו רעיון תקף לכל סכמה):</p>
+  <table>
+    <tr><th>טבלה</th><th>עמודות</th></tr>
+    <tr><td><code>person</code></td><td><u><code>id</code></u>, <code>fname</code>, <code>lname</code>, <code>city</code>, …</td></tr>
+    <tr><td><code>owns</code></td><td><u><code>id</code>, <code>license</code></u></td></tr>
+    <tr><td><code>car</code></td><td><u><code>license</code></u>, <code>model</code>, <code>brand</code>, <code>year</code></td></tr>
+    <tr><td><code>accident</code></td><td><u><code>accident_id</code>, <code>license</code></u>, <code>date</code>, <code>driver_id</code>, <code>damage</code>, <code>garage_id</code></td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="step">1</span>מה זו תצפית?</h2>
+  <p>תצפית = שאילתה ששמרנו תחת שם. נקודות מפתח (מצגת תיאור שפת SQL, נושא ה‑<code>view</code>):</p>
+  <ul style="margin:6px 0">
+    <li>היא <b>טבלה וירטואלית</b> — שולפים ממנה בדיוק כמו מטבלה: <code>select ... from &lt;שם התצפית&gt;</code>.</li>
+    <li>היא <b>לא שומרת נתונים</b> פיזית. בכל פנייה השאילתה שמאחוריה <b>מחושבת מחדש</b> — לכן היא תמיד מעודכנת לנתונים הנוכחיים.</li>
+    <li>שימושית כדי <b>לא לחזור</b> שוב ושוב על אותה שאילתה מורכבת, ולתת לה שם בעל משמעות.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="step">2</span>התחביר — <code>create view ... as</code></h2>
+  <p>מגדירים תצפית פעם אחת, ואז שולפים ממנה. הריצו (▶) את שני המשפטים ביחד:</p>
+  <pre class="sql">create view cars_per_brand as
+  select brand, count(*) as num_cars
+  from   car
+  group by brand;
+
+select * from cars_per_brand</pre>
+  <p>אחרי ה‑<code>create view</code>, <code>cars_per_brand</code> הוא שם שאפשר לשלוף ממנו כמו מכל טבלה — והוא מחזיר שורה לכל יצרן עם מספר רכביו.</p>
+  <div class="note">💡 שמות העמודות של התצפית נקבעים מה‑<code>select</code> שלה. כאן נתנו <b>במפורש</b> שם לעמודה המחושבת באמצעות <code>as num_cars</code> — זו הרגלה טובה, כי אחרת לעמודה יהיה שם ברירת‑מחדל מסורבל כמו <code>COUNT(*)</code>.</div>
+</section>
+
+<section>
+  <h2><span class="step">3</span>בונים שאילתה <b>מעל</b> התצפית</h2>
+  <p>הכוח האמיתי: אחרי שיש תצפית, אפשר לסנן / למיין / להקביץ מעליה כאילו הייתה טבלה. למשל — רק יצרנים עם 3 רכבים או יותר, ממוין יורד:</p>
+  <pre class="sql">create view cars_per_brand as
+  select brand, count(*) as num_cars
+  from   car
+  group by brand;
+
+select * from cars_per_brand
+where  num_cars &gt;= 3
+order by num_cars desc</pre>
+  <p>וגם הקבצה מעל התצפית — מה המספר הגבוה ביותר של רכבים ליצרן:</p>
+  <pre class="sql">create view cars_per_brand as
+  select brand, count(*) as num_cars
+  from   car
+  group by brand;
+
+select max(num_cars) as most
+from   cars_per_brand</pre>
+  <div class="note">📌 שימו לב כמה זה קריא: <code>select max(num_cars) from cars_per_brand</code> במקום לקנן את כל ה‑<code>group by</code> בתוך תת‑שאילתה. זו בדיוק מטרת התצפית — להסתיר מורכבות מאחורי שם.</div>
+</section>
+
+<section>
+  <h2><span class="step">4</span>תצפית מעל צירוף והקבצה</h2>
+  <p>תצפיות זורחות כשהשאילתה שמאחוריהן מורכבת. למשל תצפית שמסכמת לכל אדם כמה תאונות מעורבות מכוניותיו (כולל מי שיש לו 0) — בעזרת צירוף חיצוני שלמדנו בשיעור 6:</p>
+  <pre class="sql">create view pers_acc as
+  select person.id, person.fname, person.lname,
+         count(accident.accident_id) as num_accidents
+  from   person left outer join owns     on person.id = owns.id
+                left outer join accident on owns.license = accident.license
+  group by person.id, person.fname, person.lname;
+
+select * from pers_acc
+where  num_accidents = 0</pre>
+  <p>אחרי שהתצפית קיימת, השאלה "מי לא היה באף תאונה?" מתקצרת ל‑<code>select * from pers_acc where num_accidents = 0</code> (בנתונים: נועה וליאור).</p>
+</section>
+
+<section>
+  <h2><span class="step">5</span>למה זה שימושי + <code>drop view</code></h2>
+  <ul style="margin:6px 0">
+    <li><b>שימוש חוזר</b>: כותבים שאילתה מורכבת פעם אחת, ומשתמשים בה שוב ושוב בשם קצר.</li>
+    <li><b>פשטות</b>: שאילתות מעל התצפית קצרות וקריאות.</li>
+    <li><b>הפשטה/אבטחה</b>: אפשר לחשוף למשתמש תצפית מצומצמת במקום את הטבלאות הגולמיות.</li>
+    <li>למחיקת תצפית: <code>drop view cars_per_brand</code>.</li>
+  </ul>
+  <div class="note">⚠️ תצפית אינה מאחסנת נתונים — היא "חלון" אל הטבלאות. אם הנתונים בטבלאות משתנים, התצפית משקפת זאת אוטומטית בפנייה הבאה.</div>
+</section>
+
+<section>
+  <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". כתבו את ה‑<code>create view</code> <b>ואחריו</b> <code>select</code> מהתצפית, והריצו (▶) — תראו את התוצאה.</p>
+
+  <h3>חימום ותרגול</h3>
+  <div class="ex">
+    <div class="task">תרגיל 1 — הגדר תצפית בשם <code>recent_cars</code> שמכילה את כל הרכבים משנת ייצור <code>2023</code> ואילך, והצג את כל השורות שבה.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="create view ...; select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">create view recent_cars as
+  select * from car where year &gt;= 2023;
+
+select * from recent_cars</pre>
+      <p>התצפית היא בסך הכול שאילתה בשם. אפשר עכשיו לשלוף ממנה כמו מטבלה. בנתונים מוחזרים 8 רכבים (כל אלה משנת 2023 ואילך).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 2 — הגדר תצפית בשם <code>acc_per_garage</code> עם <code>garage_id</code> ומספר התאונות שטיפל בהן כל מוסך, ואז הצג ממנה רק מוסכים שטיפלו ב‑<b>3 תאונות או יותר</b>.</div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="create view ...; select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">create view acc_per_garage as
+  select garage_id, count(*) as n
+  from   accident
+  group by garage_id;
+
+select * from acc_per_garage
+where  n &gt;= 3</pre>
+      <p>קודם בונים את התצפית (ספירה לכל מוסך), ואז מסננים מעליה. שימו לב — הסינון <code>n &gt;= 3</code> נעשה ב‑<code>where</code> רגיל על התצפית, לא ב‑<code>having</code>, כי מבחינתנו <code>acc_per_garage</code> היא כבר "טבלה". בנתונים מוחזרים 6 מוסכים.</p>
+    </div>
+  </div>
+
+  <h3>שאלות ממבחנים אמיתיים 🎓</h3>
+  <div class="ex">
+    <div class="task">🎓 תרגיל 3 (שאלה ממבחן 9.4) — הגדר תצפית בשם <code>pers_acc</code> שתציג לכל אדם את מספר התאונות שבהן היו מעורבות מכוניות בבעלותו (<b>גם אנשים שאף אחת ממכוניותיהם לא הייתה מעורבת בתאונה</b> צריכים להופיע, עם 0).</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:13.5px">📄 מקור: מבחן 131112 · 2023 · סמסטר 2 · מועד 1 (קובץ <code>…_16208</code>) · שאלה 9.4 · סכמה <a href="../reference/glossary.html#schemas">ב' — חברת ביטוח רכב</a></p>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="create view ...; select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">create view pers_acc as
+  select person.id, person.fname, person.lname,
+         count(accident.accident_id) as num_accidents
+  from   person left outer join owns     on person.id = owns.id
+                left outer join accident on owns.license = accident.license
+  group by person.id, person.fname, person.lname;
+
+select * from pers_acc</pre>
+      <p>זו בדיוק תבנית הצירוף החיצוני + ספירת ה‑0 משיעור 6, רק עטופה ב‑<code>create view</code>. הספירה <code>count(accident.accident_id)</code> (ולא <code>count(*)</code>) נותנת <b>0</b> למי שאין לו תאונות. בנתונים יש 16 שורות; נועה וליאור מקבלים 0.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>בדיקת הבנה (משוב מיידי) 🧠</h2>
+
+  <div class="ex" id="q1">
+    <div class="task">1. מהי תצפית (view)?</div>
+    <button class="opt" onclick="pick(this,1)">שאילתה שמורה בשם, שמתנהגת כמו טבלה וירטואלית</button>
+    <button class="opt" onclick="pick(this,0)">עותק פיזי של טבלה שנשמר בדיסק</button>
+    <button class="opt" onclick="pick(this,0)">אינדקס שמאיץ שליפות</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q2">
+    <div class="task">2. האם תצפית מאחסנת את הנתונים שלה פיזית?</div>
+    <button class="opt" onclick="pick(this,1)">לא — השאילתה שמאחוריה מחושבת מחדש בכל פנייה</button>
+    <button class="opt" onclick="pick(this,0)">כן — היא שומרת עותק קבוע של התוצאה</button>
+    <button class="opt" onclick="pick(this,0)">רק אם משתמשים ב‑<code>group by</code></button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q3">
+    <div class="task">3. כיצד שולפים מתצפית בשם <code>pers_acc</code>?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">select * from pers_acc</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">run view pers_acc</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">select * using view pers_acc</button>
+    <div class="fb"></div>
+  </div>
+
+  <div class="ex" id="q4">
+    <div class="task">4. מה התחביר הנכון להגדרת תצפית?</div>
+    <button class="opt" onclick="pick(this,1)" style="direction:ltr; text-align:left">create view v as select ...</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">create table v as view select ...</button>
+    <button class="opt" onclick="pick(this,0)" style="direction:ltr; text-align:left">make view v = (select ...)</button>
+    <div class="fb"></div>
+  </div>
+</section>
+
+<section>
+  <h2>סיכום</h2>
+  <div class="next">
+    תצפית = <code>create view &lt;שם&gt; as &lt;select&gt;</code>, ואז שולפים ממנה כמו מטבלה. היא וירטואלית (לא מאחסנת נתונים), מצוינת לשימוש חוזר ולפישוט שאילתות מורכבות. כשבמבחן כתוב "<b>הגדר תצפית</b>" — עוטפים את ה‑<code>select</code> ב‑<code>create view ... as</code>.
+    <br><span style="font-size:14px; color:var(--muted)">חזרה ל‑<a href="0010-ddl-relational-algebra.html">שיעור 10 (DDL ואלגברה)</a> · <a href="0008-division-for-all.html">שיעור 8 (חלוקה)</a></span>
+  </div>
+</section>
+
+<footer>
+  שיעור 11 · קורס 131112 · מבוסס על <code>src/תיאור שפת SQL.pdf</code> (תצפיות / <code>view</code>) ושאלה 9.4 (קובץ <code>…_16208</code>)<br>
+  לפתיחה: <code>open lessons/0011-views.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  function pick(btn,correct){
+    var box=btn.closest('.ex'), fb=box.querySelector('.fb');
+    box.querySelectorAll('.opt').forEach(function(o){o.classList.remove('correct','wrong')});
+    if(correct){btn.classList.add('correct'); fb.className='fb show ok'; fb.textContent='✓ נכון!';}
+    else{btn.classList.add('wrong'); fb.className='fb show no'; fb.textContent='✗ לא מדויק — נסה שוב, או הצץ בהסבר למעלה.';}
+  }
+  // SQL blocks (highlight + ▶ run + auto-grade) handled by ../assets/sql-blocks.js + sql-run.js
+</script>
+</body>
+</html>

@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem('sqlTheme');if(!t&&typeof window.name=='string'&&window.name.indexOf('SQLBOXES:')===0){t=(JSON.parse(window.name.slice(9))||{}).__theme;}if(t==='dark'){document.documentElement.className+=' dark';}}catch(e){}</script>
+<link rel="stylesheet" href="../assets/dark.css">
 <title>שיעור 8 · חלוקה / "לכל" — division &amp; universal quantification</title>
 <style>
   :root{
@@ -149,13 +151,13 @@ having count(distinct ac.garage_id) = (select count(*) from garage where city = 
     <li><b>סינון ליקום</b> — <code>g.city = 'Jaffa'</code>: סופרים רק התאמות שנמצאות בתוך היקום.</li>
     <li><b>תנאי הכיסוי</b> — <code>having count(distinct &lt;member&gt;) = (select count(*) from &lt;universe&gt;)</code>. ה‑<code>distinct</code> קריטי: מכונית שתוקנה פעמיים באותו מוסך לא תיספר פעמיים.</li>
   </ul>
-  <div class="note">💡 <b>זו הצורה שמנוע ההרצה כאן מריץ ומדרג.</b> היא הכי בטוחה לבדיקה אוטומטית, ולכן בכל תרגיל למטה <b>הפתרון הראשון</b> הוא צורת הספירה. את ה‑<code>not exists</code> הכפול (שלב 3) נביא לצידו כצורה משנית מתויגת.</div>
+  <div class="note">💡 <b>צורת הספירה היא גישה תקפה אחת</b> — אינטואיטיבית ונוחה. אבל הצורה שהבחינה מצפה לה היא ה‑<code>not exists</code> הכפול (שלב 3), והיא רצה כאן בדיוק כמו צורת הספירה ומחזירה את אותן שורות. לכן בכל תרגיל למטה <b>הפתרון הראשון</b> הוא ה‑<code>not exists</code> הקלאסי, וצורת הספירה מובאת לצידו כצורה שקולה.</div>
 </section>
 
 <section>
   <h2><span class="step">3</span>הצורה הקלאסית של הבחינה — <code>not exists</code> כפול</h2>
   <p>זו הניסוח שמרצי הקורס מצפים לו, והוא תרגום ישיר של החלוקה באלגברה. הרעיון: ישות מכסה את כל היקום בדיוק אם <b>לא קיים</b> איבר ביקום ש<b>אין</b> לישות התאמה אליו. שתי שלילות מקוננות:</p>
-  <pre class="sql" data-norun>select p.fname, p.lname
+  <pre class="sql">select p.fname, p.lname
 from   person p
 where  not exists (                                   -- no Jaffa garage...
          select *
@@ -173,7 +175,7 @@ where  not exists (                                   -- no Jaffa garage...
     <li><b><code>not exists</code> החיצוני</b> — "אין <b>אף</b> מוסך יפו שהאדם פספס" = האדם כיסה את כל מוסכי יפו. ✓</li>
   </ul>
   <div class="note">📐 <b>הקשר לאלגברה היחסית:</b> זו בדיוק חלוקה (<code>÷</code>). באלגברה: <code>(π id,garage_id …) ÷ (π garage_id σ city='Jaffa' garage)</code>. ההגדרה של <code>÷</code> דרך חיסור (<code>−</code>) היא בדיוק "כל האנשים, פחות אלה שיש מוסך יפו שהם פספסו" — וזה ה‑<code>not exists</code> הכפול מילה במילה. בחלק מהמצגות מופיע גם האופרטור <code>contains</code> (קבוצת המוסכים של האדם <code>contains</code> את קבוצת מוסכי יפו) — אותו רעיון בדיוק, רק תחביר אחר שלא כל מנוע תומך בו.</div>
-  <div class="warn">⚠️ <b>למה לא נשים אותה ראשונה בפתרון?</b> מנוע ההרצה בדפדפן (AlaSQL) לא מטפל היטב בתת‑שאילתה מקוננת‑כפולה מתואמת — לכן <b>צורת הספירה היא הפתרון המדורג הראשון</b>, וה‑<code>not exists</code> הכפול מובא כצורה משנית (לא רצה כאן). <b>בבחינה על נייר</b> שתי הצורות מקובלות לחלוטין — והניסוח הכפול הוא הקלאסי.</div>
+  <div class="note">✅ <b>זו הצורה הקלאסית של הבחינה — והיא רצה כאן.</b> ה‑<code>not exists</code> הכפול מתואם ומחזיר בדיוק את אותן שורות כמו צורת הספירה, ולכן הוא הפתרון הראשון (המדורג) בכל תרגיל למטה. הדקות היחידה ששווה להכיר: <b>היקום הריק</b> — אם ליקום אין אף איבר, חלוקה יחסית מחזירה את <b>כל</b> הישויות (אין איבר לפספס), אז כדאי לוודא שהיקום אכן מאוכלס. שתי הצורות מקובלות לחלוטין בבחינה — והניסוח הכפול הוא הקלאסי.</div>
 </section>
 
 <section>
@@ -190,8 +192,8 @@ from   Authors au
              group by author_id) tc on tc.aid = au.author_id
 group by au.author_id, au.name, tc.cnt
 having count(distinct b.isbn) = tc.cnt</pre>
-  <p><b>הצורה הקלאסית של הבחינה</b> — <code>not exists</code> בודד למעשה ("אין לסופר אף ספר ש<b>אינו</b> Fantasy"). שימו לב שכאן זו שלילה כפולה רעיונית (<i>אין ספר שאין לו</i> סיווג Fantasy) אבל נוחה לכתיבה כ‑<code>not exists</code> אחד עם <code>not exists</code> פנימי על הז'אנר (לא רצה במנוע כאן):</p>
-  <pre class="sql" data-norun data-schema="library">select au.author_id, au.name
+  <p><b>הצורה הקלאסית של הבחינה</b> — <code>not exists</code> בודד למעשה ("אין לסופר אף ספר ש<b>אינו</b> Fantasy"). שימו לב שכאן זו שלילה כפולה רעיונית (<i>אין ספר שאין לו</i> סיווג Fantasy) אבל נוחה לכתיבה כ‑<code>not exists</code> אחד עם <code>not exists</code> פנימי על הז'אנר:</p>
+  <pre class="sql" data-schema="library">select au.author_id, au.name
 from   Authors au
 where  not exists (                              -- no book of this author...
          select *
@@ -220,67 +222,98 @@ where  not exists (                              -- no book of this author...
 
 <section>
   <h2>תרגול — כתבו ובדקו את עצמכם ✍️</h2>
-  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלת "לכל" שבמבחנים. ה‑<b>פתרון הראשון</b> בכל תרגיל הוא צורת הספירה (היא שרצה ומדרגת); ה‑<code>not exists</code> הכפול מובא כצורה משנית.</p>
+  <p>נסו בעצמכם <b>לפני</b> "הצג פתרון". הרמה עולה: חימום → תרגול → <b>שאלות ממבחנים אמיתיים</b>. המטרה שתדעו לפתור כל שאלת "לכל" שבמבחנים. בכל תרגיל ה‑<b>פתרון הראשון</b> הוא ה‑<code>not exists</code> הקלאסי (זו צורת הבחינה, והיא רצה כאן ומדרגת); צורת הספירה מובאת לצידו כצורה שקולה.</p>
 
   <h3>חימום ותרגול</h3>
+  <p style="margin:0 0 10px; color:var(--muted); font-size:14.5px">תרחישים <b>שונים</b> מהדוגמאות שלמעלה ומשאלות הבחינה — אבל אותה מיומנות בדיוק. כאן ה<b>יקום תלוי בישות</b> עצמה (קבוצת המכוניות שלה / ספריה / הז'אנרים שמעניינים אותנו), לא קבוצה קבועה כמו "מוסכי יפו".</p>
   <div class="ex">
-    <div class="task">תרגיל 1 (חימום, חלוקה) — הצג שם פרטי ומשפחה של כל אדם שמכוניותיו תוקנו ב<b>כל</b> המוסכים שב‑<code>Haifa</code>. (בנתוני הדוגמה יש מוסך יחיד בחיפה — שימו לב שזו עדיין שאלת "לכל".)</div>
+    <div class="task">תרגיל 1 (חימום — היקום הוא "המכוניות של האדם") — הצג שם פרטי ומשפחה של כל אדם ש<b>כל</b> המכוניות שבבעלותו הן מתוצרת <code>Toyota</code>. <span style="color:var(--muted); font-size:13px">(היקום תלוי‑ישות: קבוצת המכוניות של אותו אדם. שימו לב — זו אינה "אדם שיש לו ולו Toyota אחת", אלא אדם ש<b>אין</b> לו אף מכונית שאינה Toyota.)</span></div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
       <pre class="sql">select p.fname, p.lname
 from   person p
-       join owns o      on o.id = p.id
-       join accident ac on ac.license = o.license
-       join garage g    on g.garage_id = ac.garage_id and g.city = 'Haifa'
-group by p.id, p.fname, p.lname
-having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Haifa')</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
-      <pre class="sql">select p.fname, p.lname
-from   person p, owns o, accident ac, garage g
-where  o.id = p.id and ac.license = o.license
-  and  ac.garage_id = g.garage_id and g.city = 'Haifa'
-group by p.id, p.fname, p.lname
-having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Haifa')</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית (<code>not exists</code> כפול, לא רצה במנוע כאן):</p>
-      <pre class="sql" data-norun>select p.fname, p.lname
-from   person p
 where  not exists (select *
-                   from   garage g
-                   where  g.city = 'Haifa'
+                   from   owns o join car c on c.license = o.license
+                   where  o.id = p.id
                      and  not exists (select *
-                                      from   owns o join accident ac on ac.license = o.license
-                                      where  o.id = p.id and ac.garage_id = g.garage_id))</pre>
-      <p>היקום = מוסכי חיפה. גם כשהיקום הוא מוסך אחד, אותו מבנה עובד. בנתונים מוחזרים דוד, משה ותמר.</p>
+                                      from   car c2
+                                      where  c2.license = c.license
+                                        and  c2.brand = 'Toyota'))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select p.fname, p.lname
+from   person p
+       join owns o on o.id = p.id
+       join car c  on c.license = o.license and c.brand = 'Toyota'
+       join (select id, count(distinct license) cnt
+             from   owns
+             group by id) tc on tc.id = p.id
+group by p.id, p.fname, p.lname, tc.cnt
+having count(distinct c.license) = tc.cnt</pre>
+      <p><b>הצורה הקלאסית (<code>not exists</code> כפול):</b> "אין לאדם מכונית שאינה Toyota". ה‑<code>not exists</code> ה<b>פנימי</b> בודק "המכונית הזו היא Toyota"; ה‑<code>not exists</code> ה<b>חיצוני</b>: "אין לו אף מכונית שאינה כזו". היקום תלוי‑ישות: כל מכוניות האדם.</p>
+      <div class="note">💡 <b>קיצור עם <code>&lt;&gt;</code>:</b> האופרטור <code>&lt;&gt;</code> פירושו <b>"לא שווה"</b> (זהה ל‑<code>!=</code>). במקום ה‑<code>not exists</code> הפנימי אפשר לכתוב ישירות "מכונית שאינה Toyota": <code>... where o.id = p.id and c.brand &lt;&gt; 'Toyota'</code>. שתי הצורות שקולות לחלוטין.</div>
+      <p>בנתונים מוחזרים <b>David Levi</b>, <b>Yossi Shem Tov</b>, <b>Lior Ben David</b> ו‑<b>Shira Mor</b> — לכל אחד מהם כל הרכבים שבבעלותו הם Toyota.</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 2 (ספרייה, "כל ה‑X של הישות") — הצג <code>author_id</code> ו‑<code>name</code> של כל סופר ש<b>כל ספריו</b> שייכים לז'אנר <code>Science</code>.</div>
-    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Authors(author_id, name)</code> · <code>Books(isbn, author_id, …)</code> · <code>Book_Genres(isbn, genre_id)</code> · <code>Genres(genre_id, genre_name)</code></p>
+    <div class="task">תרגיל 2 (ספרייה — היקום הוא "ספרי הסופר") — הצג <code>author_id</code> ו‑<code>name</code> של כל סופר ש<b>כל</b> ספריו <b>הושאלו</b> לפחות פעם אחת (אין לו ספר שמעולם לא יצא בהשאלה).</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Authors(author_id, name)</code> · <code>Books(isbn, author_id, …)</code> · <code>Loans(loan_id, book_isbn, borrower_id, …)</code></p>
     <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
       <pre class="sql">select au.author_id, au.name
 from   Authors au
-       join Books b        on b.author_id = au.author_id
-       join Book_Genres bg on bg.isbn = b.isbn
-       join Genres g       on g.genre_id = bg.genre_id and g.genre_name = 'Science'
+where  not exists (select *
+                   from   Books b
+                   where  b.author_id = au.author_id
+                     and  not exists (select *
+                                      from   Loans l
+                                      where  l.book_isbn = b.isbn))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select au.author_id, au.name
+from   Authors au
+       join Books b on b.author_id = au.author_id
+       join Loans l on l.book_isbn = b.isbn
        join (select author_id aid, count(distinct isbn) cnt
              from   Books
              group by author_id) tc on tc.aid = au.author_id
 group by au.author_id, au.name, tc.cnt
 having count(distinct b.isbn) = tc.cnt</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית (<code>not exists</code> — "אין לסופר ספר שאינו Science", לא רצה במנוע כאן):</p>
-      <pre class="sql" data-norun>select au.author_id, au.name
-from   Authors au
+      <p>הצורה הקלאסית: "אין לסופר ספר שלא הושאל מעולם". שימו לב להבדל מהדוגמה שלמעלה: שם ההתאמה הייתה "הספר שייך לז'אנר Y", כאן ההתאמה היא "הספר הושאל". בצורת הספירה ה‑<code>join</code> ל‑<code>Loans</code> משאיר רק ספרים שהושאלו, והספירה דורשת שמספרם ישווה לסך ספרי הסופר. בנתונים מוחזרים המחברים 10, 11, 12, 15, 16 ו‑17 (המחברים 13 ו‑14 נופלים — לכל אחד מהם יש ספר שלא הושאל).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">תרגיל 3 (קשה יותר — היקום נגזר מסופר אחר) — הז'אנרים שכתב בהם הסופר <code>13</code> (<code>D. Quill</code>) הם <code>Fantasy</code>, <code>History</code> ו‑<code>Fiction</code>. מצא את ה<b>קוראים</b> (<code>borrower_id</code>, <code>name</code>) שהשאילו ספר מ<b>כל</b> אחד מהז'אנרים האלה. <span style="color:var(--muted); font-size:13px">(היקום אינו קבוע מראש — הוא קבוצת הז'אנרים של סופר 13; חשבו אותה בתת‑שאילתה.)</span></div>
+    <p style="margin:2px 0 8px"><a href="0008-exercise3-explained.html">📘 קשה? כאן יש הסבר צעד‑אחר‑צעד מלא לתרגיל הזה ←</a></p>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Borrowers(borrower_id, name, …)</code> · <code>Loans(loan_id, book_isbn, borrower_id, …)</code> · <code>Books(isbn, author_id, …)</code> · <code>Book_Genres(isbn, genre_id)</code></p>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
 where  not exists (select *
-                   from   Books b
-                   where  b.author_id = au.author_id
+                   from   Books b2 join Book_Genres bg2 on bg2.isbn = b2.isbn
+                   where  b2.author_id = 13
                      and  not exists (select *
-                                      from   Book_Genres bg join Genres g on g.genre_id = bg.genre_id
-                                      where  bg.isbn = b.isbn and g.genre_name = 'Science'))</pre>
-      <p>היקום תלוי‑ישות: ספרי הסופר. הספירה משווה מספר ספרי ה‑Science למספר הכולל של ספריו. בנתונים מוחזרים מחברים 11 ו‑17.</p>
+                                      from   Loans l join Book_Genres bg on bg.isbn = l.book_isbn
+                                      where  l.borrower_id = br.borrower_id
+                                        and  bg.genre_id = bg2.genre_id))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
+       join Loans l        on l.borrower_id = br.borrower_id
+       join Book_Genres bg on bg.isbn = l.book_isbn
+       join (select distinct bg2.genre_id
+             from   Books b2 join Book_Genres bg2 on bg2.isbn = b2.isbn
+             where  b2.author_id = 13) u on u.genre_id = bg.genre_id
+group by br.borrower_id, br.name
+having count(distinct bg.genre_id) =
+       (select count(distinct bg3.genre_id)
+        from   Books b3 join Book_Genres bg3 on bg3.isbn = b3.isbn
+        where  b3.author_id = 13)</pre>
+      <p>הצורה הקלאסית: "אין ז'אנר של סופר 13 שהקורא לא השאיל ממנו ספר". היקום = הז'אנרים של סופר 13. בצורת הספירה ה‑<code>join</code> ל‑<code>u</code> מסנן את ההשאלות לז'אנרים שביקום בלבד, ואז סופרים כמה מהם הקורא כיסה. בנתונים מוחזרים <b>Dana</b> (200) ו‑<b>Shai</b> (207).</p>
     </div>
   </div>
 
@@ -295,28 +328,21 @@ where  not exists (select *
     <div class="solution">
       <pre class="sql">select p.fname, p.lname
 from   person p
-       join owns o      on o.id = p.id
-       join accident ac on ac.license = o.license
-       join garage g    on g.garage_id = ac.garage_id and g.city = 'Jaffa'
-group by p.id, p.fname, p.lname
-having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Jaffa')</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
-      <pre class="sql">select p.fname, p.lname
-from   person p, owns o, accident ac, garage g
-where  o.id = p.id and ac.license = o.license
-  and  ac.garage_id = g.garage_id and g.city = 'Jaffa'
-group by p.id, p.fname, p.lname
-having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Jaffa')</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית של הבחינה (<code>not exists</code> כפול, לא רצה במנוע כאן):</p>
-      <pre class="sql" data-norun>select p.fname, p.lname
-from   person p
 where  not exists (select *
                    from   garage g
                    where  g.city = 'Jaffa'
                      and  not exists (select *
                                       from   owns o join accident ac on ac.license = o.license
                                       where  o.id = p.id and ac.garage_id = g.garage_id))</pre>
-      <p>היקום = שני מוסכי יפו (<code>Jaffa Auto</code> ו‑<code>Marina Garage</code>). רק דוד לוי כיסה את שניהם: מכוניותיו תוקנו בשניהם, ולכן <code>count(distinct garage_id) = 2 = </code> סך מוסכי יפו. בנתונים מוחזר <b>David Levi</b> בלבד.</p>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select p.fname, p.lname
+from   person p
+       join owns o      on o.id = p.id
+       join accident ac on ac.license = o.license
+       join garage g    on g.garage_id = ac.garage_id and g.city = 'Jaffa'
+group by p.id, p.fname, p.lname
+having count(distinct ac.garage_id) = (select count(*) from garage where city = 'Jaffa')</pre>
+      <p>זו הצורה הקלאסית של הבחינה. היקום = שני מוסכי יפו (<code>Jaffa Auto</code> ו‑<code>Marina Garage</code>). רק דוד לוי כיסה את שניהם: מכוניותיו תוקנו בשניהם, ולכן בצורת הספירה <code>count(distinct garage_id) = 2 = </code> סך מוסכי יפו. בנתונים מוחזר <b>David Levi</b> בלבד.</p>
     </div>
   </div>
 
@@ -328,6 +354,15 @@ where  not exists (select *
     <div class="solution">
       <pre class="sql">select au.author_id, au.name
 from   Authors au
+where  not exists (select *
+                   from   Books b
+                   where  b.author_id = au.author_id
+                     and  not exists (select *
+                                      from   Book_Genres bg join Genres g on g.genre_id = bg.genre_id
+                                      where  bg.isbn = b.isbn and g.genre_name = 'Fantasy'))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select au.author_id, au.name
+from   Authors au
        join Books b        on b.author_id = au.author_id
        join Book_Genres bg on bg.isbn = b.isbn
        join Genres g       on g.genre_id = bg.genre_id and g.genre_name = 'Fantasy'
@@ -336,25 +371,7 @@ from   Authors au
              group by author_id) tc on tc.aid = au.author_id
 group by au.author_id, au.name, tc.cnt
 having count(distinct b.isbn) = tc.cnt</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where (ה‑join לטבלת הספירה כתת‑שאילתה ב‑from):</p>
-      <pre class="sql">select au.author_id, au.name
-from   Authors au, Books b, Book_Genres bg, Genres g,
-       (select author_id aid, count(distinct isbn) cnt from Books group by author_id) tc
-where  b.author_id = au.author_id and bg.isbn = b.isbn
-  and  g.genre_id = bg.genre_id and g.genre_name = 'Fantasy'
-  and  tc.aid = au.author_id
-group by au.author_id, au.name, tc.cnt
-having count(distinct b.isbn) = tc.cnt</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית של הבחינה (<code>not exists</code> — "אין לסופר ספר שאינו Fantasy", לא רצה במנוע כאן):</p>
-      <pre class="sql" data-norun>select au.author_id, au.name
-from   Authors au
-where  not exists (select *
-                   from   Books b
-                   where  b.author_id = au.author_id
-                     and  not exists (select *
-                                      from   Book_Genres bg join Genres g on g.genre_id = bg.genre_id
-                                      where  bg.isbn = b.isbn and g.genre_name = 'Fantasy'))</pre>
-      <p>"כל ספריו Fantasy" = אין לו ספר שאינו Fantasy = מספר ספרי ה‑Fantasy שלו שווה לסך ספריו. בנתונים מוחזרים מחברים 10 (<code>A. Writer</code>), 15 (<code>F. Tales</code>) ו‑16 (<code>G. Sage</code>) — כל ספריהם מסווגים (גם) Fantasy.</p>
+      <p>זו הצורה הקלאסית של הבחינה: "כל ספריו Fantasy" = אין לו ספר שאינו Fantasy = מספר ספרי ה‑Fantasy שלו שווה לסך ספריו. בנתונים מוחזרים מחברים 10 (<code>A. Writer</code>), 15 (<code>F. Tales</code>) ו‑16 (<code>G. Sage</code>) — כל ספריהם מסווגים (גם) Fantasy.</p>
     </div>
   </div>
 
@@ -364,6 +381,15 @@ where  not exists (select *
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
+      <pre class="sql">select distinct c.brand
+from   car c
+where  not exists (select *
+                   from   car c2
+                   where  c2.brand = c.brand
+                     and  not exists (select *
+                                      from   accident ac
+                                      where  ac.license = c2.license))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
       <pre class="sql">select c.brand
 from   car c
        join accident ac on ac.license = c.license
@@ -372,23 +398,7 @@ from   car c
              group by brand) tb on tb.brand = c.brand
 group by c.brand, tb.cnt
 having count(distinct c.license) = tb.cnt</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
-      <pre class="sql">select c.brand
-from   car c, accident ac,
-       (select brand, count(distinct license) cnt from car group by brand) tb
-where  ac.license = c.license and tb.brand = c.brand
-group by c.brand, tb.cnt
-having count(distinct c.license) = tb.cnt</pre>
-      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— הצורה הקלאסית של הבחינה (<code>not exists</code> — "אין ליצרן רכב שלא היה בתאונה", לא רצה במנוע כאן):</p>
-      <pre class="sql" data-norun>select distinct c.brand
-from   car c
-where  not exists (select *
-                   from   car c2
-                   where  c2.brand = c.brand
-                     and  not exists (select *
-                                      from   accident ac
-                                      where  ac.license = c2.license))</pre>
-      <p>היקום תלוי‑ישות: מכוניות אותו יצרן. יצרן מתאים אם מספר מכוניותיו ש<b>היו</b> בתאונה שווה לסך כל מכוניותיו. בנתונים מוחזרים חמישה יצרנים (<code>Honda</code>, <code>Mazda</code>, <code>Kia</code>, <code>BMW</code>, <code>Hyundai</code>) — אצל כל אחד מהם כל הרכבים שבמאגר היו בתאונה.</p>
+      <p>זו הצורה הקלאסית של הבחינה: "אין ליצרן רכב שלא היה בתאונה". היקום תלוי‑ישות: מכוניות אותו יצרן. יצרן מתאים אם מספר מכוניותיו ש<b>היו</b> בתאונה שווה לסך כל מכוניותיו. בנתונים מוחזרים חמישה יצרנים (<code>Honda</code>, <code>Mazda</code>, <code>Kia</code>, <code>BMW</code>, <code>Hyundai</code>) — אצל כל אחד מהם כל הרכבים שבמאגר היו בתאונה.</p>
     </div>
   </div>
 </section>
@@ -442,6 +452,11 @@ where  not exists (select *
     <b>אני המורה שלך — תשאל! 🙋</b>
     <p style="margin:6px 0 0">לא בטוח לזהות מתי שאלה היא "חלוקה"? רוצה לראות צעד‑אחר‑צעד איך ה‑<code>not exists</code> הכפול שקול לצורת הספירה, או איך נראית חלוקה (<code>÷</code>) באלגברה היחסית ומדוע היא מתורגמת לחיסור? כתוב לי בצ'אט.</p>
   </div>
+</section>
+
+<section>
+  <h2>רוצים עוד תרגול?</h2>
+  <div class="next">📝 הכנתי <a href="0008-extra-division-practice.html"><b>5 שאלות חלוקה נוספות לתרגול</b></a> — אותו סגנון, עם פתרונות והרצה (▶). מומלץ אם הנושא עדיין מאתגר.</div>
 </section>
 
 <section>

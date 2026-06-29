@@ -1,0 +1,82 @@
+/* dark.css — shared dark theme for all lessons (+ the reference pages).
+ * Loaded render-blocking in every lesson's <head>; rules apply only when
+ * <html> carries the `dark` class. A tiny inline <head> snippet sets that class
+ * from the saved choice BEFORE first paint (no flash); sql-blocks.js builds the
+ * 🌙/☀️ toggle and persists the choice (localStorage 'sqlTheme' + window.name).
+ *
+ * Most of the palette is driven by the lessons' CSS variables, so redefining
+ * them under html.dark flips the bulk of the page; the rest are explicit
+ * overrides for hard-coded light hexes. html.dark-prefixed selectors outrank
+ * the lessons' own rules, so load order doesn't matter. */
+
+html.dark{
+  --bg:#0f141c; --card:#161d29; --ink:#e6ecf7; --muted:#97a3b8;
+  --primary:#79a0ff; --primary-soft:#1a2840; --line:#2a3142;
+  --accent:#45d39a; --accent-soft:#103027; --danger:#ff7a7a; --danger-soft:#38191c;
+  --kw:#86a8ff; --str:#e2ad6e; --cmt:#8a93a6;
+  color-scheme: dark;
+}
+html.dark body{background:var(--bg); color:var(--ink)}
+
+/* inline code + code inside table cells */
+html.dark code, html.dark .en, html.dark td code{background:#1b2740; color:#cdd9ff}
+
+/* static SQL / RA blocks */
+html.dark pre.sql{background:#0e1726}
+html.dark pre.bad{background:#2a1518}
+html.dark pre.ra{background:#1a1530}
+
+/* tables */
+html.dark tr:nth-child(even) td{background:#131b29}
+
+/* info / callout boxes (light tints + dark text in light mode -> flip both) */
+html.dark .note{background:#2b2410; border-color:#574615}
+html.dark .exam{background:#102619; border-color:#1e5640; color:#9be7c4}
+html.dark .recap{border-color:#2a3a5e}
+html.dark .warn{border-color:#5c2a2a; color:#ffb1a8}
+html.dark .goal{border-color:#1e5640; color:#9be7c4}
+html.dark .ex{background:#121a28; border-color:#28344e}
+html.dark .next{border-color:#3a4a72}
+html.dark .solution{border-color:#1e5640}
+html.dark .flow .t{background:#121a28}
+
+/* practice inputs + MCQ options */
+html.dark .ex textarea, html.dark textarea.sql-box, html.dark .opt{background:#0e1626; color:var(--ink); border-color:var(--line)}
+html.dark .opt.correct{color:#9be7c4}
+html.dark .opt.wrong{color:#ffb1a8}
+html.dark .fb.ok{color:#9be7c4}
+html.dark .fb.no{color:#ffb1a8}
+
+/* buttons / chips that sit on var(--primary) (light blue in dark) -> dark text */
+html.dark .step{color:#0f141c}
+html.dark .reveal-btn{background:#3a5db0; color:#fff}
+html.dark .reveal-btn:hover{background:#34539e}
+
+/* sql-blocks.js injected UI: mode toggle + highlight overlay */
+html.dark #sqlmode{background:#161d29; border-color:#2a3142}
+html.dark #sqlmode b{color:var(--muted)}
+html.dark #sqlmode button{background:#1a2840; color:#cdd9ff}
+html.dark #sqlmode button.on{background:var(--primary); color:#0f141c}
+html.dark .hlbox-pre{color:var(--ink)}
+html.dark .hlbox.hlbox>textarea{caret-color:var(--ink)}
+html.dark .hlbox-pre .kw{color:var(--kw)}
+html.dark .hlbox-pre .str{color:var(--str)}
+html.dark .hlbox-pre .cmt{color:var(--cmt)}
+
+/* sql-run.js injected UI: ▶ run button output */
+html.dark .sqlrun-out table{background:#0e1626}
+html.dark .sqlrun-out th{background:#1a2840; color:#cdd9ff}
+html.dark .sqlrun-out th, html.dark .sqlrun-out td{border-color:#28344e}
+html.dark .sqlrun-err{background:#38191c; color:#ffb1a8; border-color:#5c2a2a}
+html.dark .sqlrun-ok{background:#103027; color:#9be7c4; border-color:#1e5640}
+html.dark .sqlrun-no{background:#2b2410; color:#f0cd86; border-color:#574615}
+
+/* theme toggle button (base style is injected by sql-blocks.js) */
+html.dark #themebtn{background:#161d29; border-color:#2a3142}
+
+/* reference pages (glossary / exam-questions-full) extra classes */
+html.dark .qbox{background:#102619; border-color:#1e5640; color:#bfe8d4}
+html.dark .dropped{background:#2b2410; border-color:#574615; color:#f0cd86}
+html.dark .covered{border-color:#2a3a5e}
+html.dark .schema-name{color:var(--muted)}
+html.dark .pk{color:#9be7c4}

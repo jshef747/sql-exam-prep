@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem('sqlTheme');if(!t&&typeof window.name=='string'&&window.name.indexOf('SQLBOXES:')===0){t=(JSON.parse(window.name.slice(9))||{}).__theme;}if(t==='dark'){document.documentElement.className+=' dark';}}catch(e){}</script>
+<link rel="stylesheet" href="../assets/dark.css">
 <title>שיעור 9 · ספירה והשוואה — group by … having count · "הכי הרבה" · השוואה בין תקופות</title>
 <style>
   :root{
@@ -180,112 +182,115 @@ where  (select count(*) from accident
 
   <h3>חימום ותרגול</h3>
   <div class="ex">
-    <div class="task">תרגיל 1 (ספירה ≥ N) — הצג את ה‑<code>license</code> ומספר הבעלים של כל רכב ש<b>יש לו 2 בעלים או יותר</b>.</div>
+    <div class="task">תרגיל 1 (ספירה ≥ N, קיבוץ בלי צירוף) — הצג כל <b>יצרן</b> (<code>brand</code>) שיש לו <b>4 דגמי רכב או יותר</b> במאגר, ואת מספר הרכבים שלו.</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select license, count(*) as num_owners
-from   owns
-group  by license
-having count(*) &gt;= 2</pre>
-      <p>"2 בעלים או יותר" ⟵ <code>group by license having count(*) &gt;= 2</code>. בדוגמה מוחזרים 3 רכבים.</p>
+      <pre class="sql">select brand, count(*) as num_cars
+from   car
+group  by brand
+having count(*) &gt;= 4</pre>
+      <p>"יצרן עם 4 רכבים או יותר" ⟵ קבצו את <code>car</code> לפי <code>brand</code>, ספרו, וסננו ב‑<code>having count(*) &gt;= 4</code>. הקיבוץ כאן הוא על עמודה רגילה (לא מפתח) — אין צורך בצירוף. בדוגמה מוחזרים 2 יצרנים (Toyota עם 6, Tesla עם 4).</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 2 (ספירה ≥ N עם צירוף) — הצג שם פרטי, משפחה ומספר המכוניות של כל אדם ש<b>בבעלותו 3 מכוניות או יותר</b>.</div>
+    <div class="task">תרגיל 2 (ספירה ≥ N עם צירוף) — הצג כל <b>עיר</b> (<code>city</code>) שהמוסכים שבה טיפלו יחד ב<b>5 רשומות תאונה או יותר</b>, ואת מספר רשומות התאונה.</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select p.fname, p.lname, count(*) as num_cars
-from   person p join owns o on p.id = o.id
-group  by p.id, p.fname, p.lname
-having count(*) &gt;= 3</pre>
+      <pre class="sql">select   g.city, count(*) as num_accidents
+from     garage g join accident a on g.garage_id = a.garage_id
+group by g.city
+having   count(*) &gt;= 5</pre>
       <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
-      <pre class="sql">select p.fname, p.lname, count(*) as num_cars
-from   person p, owns o
-where  p.id = o.id
-group  by p.id, p.fname, p.lname
-having count(*) &gt;= 3</pre>
-      <p>קודם מצרפים אדם↔בעלוּת, מקבצים לפי <code>p.id</code>, וסופרים. בדוגמה מוחזר אדם אחד (David Levi, 3 מכוניות).</p>
+      <pre class="sql">select   g.city, count(*) as num_accidents
+from     garage g, accident a
+where    g.garage_id = a.garage_id
+group by g.city
+having   count(*) &gt;= 5</pre>
+      <p>הספירה (תאונות) בטבלת <code>accident</code> אבל הישות (עיר) בטבלת <code>garage</code> — אז קודם מצרפים מוסך↔תאונה, ואז מקבצים לפי <code>g.city</code>. שימו לב: עיר עם <b>כמה</b> מוסכים מאגדת את כל התאונות שלהם. בדוגמה מוחזרות 2 ערים (Tel Aviv עם 8, Haifa עם 7).</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 3 (ספירה ≥ N על תאונות) — הצג <code>license</code>, <code>model</code> ומספר התאונות של כל רכב שהיה מעורב ב<b>2 תאונות או יותר</b>.</div>
+    <div class="task">תרגיל 3 (ספירה ≥ N — סופרים נהגים) — הצג כל <code>driver_id</code> של נהג שהיה מעורב ב<b>2 תאונות או יותר</b>, ואת מספר התאונות שלו.</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select c.license, c.model, count(*) as num_accidents
-from   car c join accident a on c.license = a.license
-group  by c.license, c.model
-having count(*) &gt;= 2</pre>
-      <p>צירוף <code>car</code>↔<code>accident</code>, קיבוץ לפי הרכב, וספירת התאונות. בדוגמה מוחזרים 6 רכבים.</p>
+      <pre class="sql">select   driver_id, count(*) as num_accidents
+from     accident
+group by driver_id
+having   count(*) &gt;= 2</pre>
+      <p>הפעם הישות היא ה<b>נהג</b> (<code>driver_id</code>), שכבר נמצא בתוך <code>accident</code> — אז מקבצים לפיו ישירות, בלי צירוף. בדוגמה מוחזרים 7 נהגים.</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 4 ("הכי הרבה") — הצג את ה‑<code>license</code> של הרכב/ים שהיו ב<b>הכי הרבה</b> תאונות, ואת מספר התאונות שלו/הם.</div>
+    <div class="task">תרגיל 4 ("הכי הרבה" עם צירוף) — הצג את <code>garage_id</code>, <code>garage_name</code> ומספר התאונות של ה<b>מוסך/ים שטיפל הכי הרבה</b> ברשומות תאונה.</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select   a.license, count(*) as num_accidents
-from     accident a
-group by a.license
+      <pre class="sql">select   g.garage_id, g.garage_name, count(*) as num_accidents
+from     garage g join accident a on g.garage_id = a.garage_id
+group by g.garage_id, g.garage_name
 having   count(*) = (select max(c)
                      from   (select count(*) as c
                              from   accident
-                             group  by license) x)</pre>
-      <p>"הכי הרבה" = הספירה שווה ל‑<code>max</code> של כל הספירות (טבלה נגזרת). אם כמה רכבים חולקים את השיא — כולם יחזרו (בדוגמה: 3 רכבים עם 3 תאונות כל אחד).</p>
+                             group  by garage_id) x)</pre>
+      <p>"הכי הרבה" = הספירה שווה ל‑<code>max</code> של כל הספירות (טבלה נגזרת לפי <code>garage_id</code>). מצרפים מוסך↔תאונה כדי להציג גם את שם המוסך. בדוגמה מוחזר מוסך אחד (AutoCare עם 7 תאונות).</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 5 ("הכי הרבה" עם צירוף) — הצג שם פרטי ומשפחה של האדם/ים ש<b>בבעלותו הכי הרבה</b> מכוניות, ומספר המכוניות.</div>
+    <div class="task">תרגיל 5 ("הכי הרבה" בלי צירוף) — הצג את ה<b>יצרן/ים שיש לו הכי הרבה</b> רכבים במאגר, ואת מספר הרכבים.</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select   p.fname, p.lname, count(*) as num_cars
-from     person p join owns o on p.id = o.id
-group by p.id, p.fname, p.lname
+      <pre class="sql">select   brand, count(*) as num_cars
+from     car
+group by brand
 having   count(*) = (select max(c)
                      from   (select count(*) as c
-                             from   owns
-                             group  by id) x)</pre>
-      <p>אותו דפוס כמו תרגיל 4, אבל הישות (אדם) דורשת צירוף, והטבלה הנגזרת סופרת לכל <code>id</code> כמה רכבים. בדוגמה: David Levi עם 3 מכוניות.</p>
+                             from   car
+                             group  by brand) x)</pre>
+      <p>אותו דפוס "הכי הרבה" כמו תרגיל 4, אבל הישות (יצרן) נמצאת באותה טבלה — ולכן אין צורך בצירוף, לא בחיצונית ולא בטבלה הנגזרת. בדוגמה: Toyota עם 6 רכבים.</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 6 (השוואה בין תקופות — הכיוון ההפוך) — הצג <code>license</code>, <code>model</code>, <code>brand</code> של רכבים שב‑2024 היו ב<b>יותר</b> תאונות מאשר ב‑2023.</div>
+    <div class="task">תרגיל 6 (השוואה בין תקופות — על מוסכים) — הצג <code>garage_id</code>, <code>garage_name</code> של מוסכים שב‑2024 טיפלו ב<b>יותר</b> רשומות תאונה מאשר ב‑2023.</div>
     <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select c.license, c.model, c.brand
-from   car c
+      <pre class="sql">select g.garage_id, g.garage_name
+from   garage g
 where  (select count(*) from accident
-        where  license = c.license and [date] like '2024%')
+        where  garage_id = g.garage_id and [date] like '2024%')
        &gt;
        (select count(*) from accident
-        where  license = c.license and [date] like '2023%')</pre>
-      <p>שתי תת‑שאילתות סקלריות מתואמות (<code>license = c.license</code>), אחת לכל שנה, והשוואה <code>&gt;</code>. בדוגמה מוחזרים 9 רכבים.</p>
+        where  garage_id = g.garage_id and [date] like '2023%')</pre>
+      <p>אותו רעיון של השוואה בין תקופות, אבל הפעם הישות היא ה<b>מוסך</b>: שתי תת‑שאילתות סקלריות מתואמות (<code>garage_id = g.garage_id</code>), אחת סופרת תאונות 2024 והשנייה 2023, וההשוואה <code>&gt;</code>. בדוגמה מוחזרים 6 מוסכים.</p>
     </div>
   </div>
 
   <div class="ex">
-    <div class="task">תרגיל 7 (ספרייה, "הכי הרבה") — הצג את שם השואל/ים (<code>name</code>) ש<b>השאיל הכי הרבה</b> ספרים, ואת מספר ההשאלות.</div>
-    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Borrowers(borrower_id, name, …)</code> · <code>Loans(loan_id, book_isbn, borrower_id, …)</code></p>
+    <div class="task">תרגיל 7 (ספרייה, ספירה ≥ N עם צירוף) — הצג את שם המחבר/ים (<code>name</code>) ש<b>כתב 4 ספרים או יותר</b>, ואת מספר הספרים.</div>
+    <p style="margin:2px 0 6px; color:var(--muted); font-size:14px">טבלאות: <code>Authors(author_id, name, …)</code> · <code>Books(isbn, title, author_id, …)</code></p>
     <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
     <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
     <div class="solution">
-      <pre class="sql">select   br.name, count(*) as num_loans
-from     Borrowers br join Loans l on br.borrower_id = l.borrower_id
-group by br.borrower_id, br.name
-having   count(*) = (select max(c)
-                     from   (select count(*) as c
-                             from   Loans
-                             group  by borrower_id) x)</pre>
-      <p>אותו דפוס "הכי הרבה" בסכמת הספרייה. בדוגמה יש שוויון בשיא, ולכן מוחזרים 2 שואלים (4 השאלות כל אחד).</p>
+      <pre class="sql">select   au.name, count(*) as num_books
+from     Authors au join Books b on au.author_id = b.author_id
+group by au.author_id, au.name
+having   count(*) &gt;= 4</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— אותו דבר עם פסיק ו‑where:</p>
+      <pre class="sql">select   au.name, count(*) as num_books
+from     Authors au, Books b
+where    au.author_id = b.author_id
+group by au.author_id, au.name
+having   count(*) &gt;= 4</pre>
+      <p>אותה תבנית "ספירה ≥ N עם צירוף" בסכמת הספרייה: מצרפים מחבר↔ספר, מקבצים לפי <code>au.author_id</code>, וסופרים. בדוגמה מוחזר מחבר אחד (B. Scholar עם 5 ספרים).</p>
     </div>
   </div>
 

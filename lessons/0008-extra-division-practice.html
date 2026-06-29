@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem('sqlTheme');if(!t&&typeof window.name=='string'&&window.name.indexOf('SQLBOXES:')===0){t=(JSON.parse(window.name.slice(9))||{}).__theme;}if(t==='dark'){document.documentElement.className+=' dark';}}catch(e){}</script>
+<link rel="stylesheet" href="../assets/dark.css">
+<title>שיעור 8 · תרגול נוסף — חלוקה / "לכל" (5 שאלות)</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#7c3aed,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:22px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:26px}
+  header.top p{margin:0; opacity:.93}
+  .backlink{margin:0 0 18px}
+  .backlink a{color:var(--primary); font-weight:600; text-decoration:none}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:22px 26px; margin-bottom:18px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:21px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:12px 16px; margin:12px 0}
+  .ex{background:#f9fbff; border:1px solid #d6e2f6; border-radius:14px; padding:18px 20px; margin:16px 0}
+  .ex .task{font-weight:700; margin-bottom:4px}
+  .tag{display:inline-block; border-radius:999px; padding:1px 10px; font-size:12.5px; font-weight:700; margin-left:6px}
+  .tag.warm{background:var(--accent-soft); color:#0a5d3f; border:1px solid #bfe3d2}
+  .tag.mid{background:#eaf0fb; color:var(--primary); border:1px solid #cfdcf3}
+  .tag.hard{background:#f3e8ff; color:#6b21a8; border:1px solid #e0c8f5}
+  .ex textarea{width:100%; min-height:84px; direction:ltr; text-align:left;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:14.5px; line-height:1.6;
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical; background:#fff; color:var(--ink)}
+  button.reveal-btn{font-family:inherit; cursor:pointer; border:none; border-radius:9px; padding:8px 16px;
+    font-size:15px; font-weight:600; margin-top:8px; background:var(--primary); color:#fff}
+  button.reveal-btn:hover{background:#23407a}
+  .solution{display:none; margin-top:12px; background:var(--accent-soft); border:1px solid #bfe3d2; border-radius:10px; padding:6px 16px 12px}
+  .solution.show{display:block}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} .ex,button{display:none} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="car-insurance">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 8 · תרגול נוסף</div>
+  <h1>עוד 5 שאלות חלוקה / "לכל" — לתרגול</h1>
+  <p>אותו סגנון כמו שיעור 8. נסו בעצמכם, הריצו (▶) ובדקו את עצמכם. בכל פתרון ה<b>צורה הראשונה</b> היא ה‑<code>not exists</code> (הצורה הקלאסית של הבחינה), ואחריה <b>צורת הספירה</b> השקולה.</p>
+</header>
+
+<div class="backlink">← <a href="0008-division-for-all.html">שיעור 8 (חלוקה)</a> · <a href="0008-exercise3-explained.html">ההסבר המורחב לתרגיל 3</a></div>
+
+<section>
+  <div class="note">💡 <b>תזכורת המתכון:</b> בכל שאלת "לכל" זהו (1) <b>הישות</b> שמוחזרת ← <code>group by</code> / הצד החיצוני; (2) <b>היקום</b> שצריך לכסות (קבוע כמו <code>{Toyota,Tesla}</code>, תלוי‑ישות כמו "מכוניות האדם", או נגזר משאילתה); (3) <b>ההתאמה</b>. אז: <code>not exists ( איבר ביקום that not exists ( התאמה ) )</code>, או <code>having count(distinct member) = (גודל היקום)</code>.</div>
+</section>
+
+<section>
+  <h2>השאלות</h2>
+
+  <div class="ex">
+    <div class="task">שאלה 1 <span class="tag warm">חימום · "כל ה‑X הם Y"</span></div>
+    <div>הצג שם פרטי ומשפחה של כל אדם ש<b>כל</b> המכוניות שבבעלותו הן משנת ייצור <code>2018</code> ואילך. <span style="color:var(--muted); font-size:13.5px">(היקום תלוי‑ישות: מכוניות האדם. = "אין לו אף מכונית מלפני 2018".)</span></div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select p.fname, p.lname
+from   person p
+where  not exists (select *
+                   from   owns o join car c on c.license = o.license
+                   where  o.id = p.id and c.year &lt; 2018)</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select p.fname, p.lname
+from   person p
+       join owns o on o.id = p.id
+       join car c  on c.license = o.license and c.year &gt;= 2018
+       join (select id, count(distinct license) cnt from owns group by id) tc
+            on tc.id = p.id
+group by p.id, p.fname, p.lname, tc.cnt
+having count(distinct c.license) = tc.cnt</pre>
+      <p>"כל מכוניותיו ≥2018" = אין לו מכונית מלפני 2018. בנתונים מוחזרים 7 אנשים (Levi, Friedman, Bar, Katz, Peretz, Azulay, Mor).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">שאלה 2 <span class="tag mid">בינוני · יקום קבוע</span></div>
+    <div>הצג שם פרטי ומשפחה של כל אדם שיש בבעלותו מכונית מ<b>כל</b> אחד מהיצרנים בקבוצה <code>{Toyota, Tesla}</code> (כלומר גם Toyota וגם Tesla). <span style="color:var(--muted); font-size:13.5px">(היקום הקבוע: שני היצרנים. ההתאמה: יש לו רכב מהיצרן הזה.)</span></div>
+    <textarea class="sql-box" data-schema="car-insurance" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select p.fname, p.lname
+from   person p
+where  not exists (select *
+                   from   (select distinct brand from car
+                           where brand in ('Toyota', 'Tesla')) bu
+                   where  not exists (select *
+                                      from   owns o join car c on c.license = o.license
+                                      where  o.id = p.id and c.brand = bu.brand))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select p.fname, p.lname
+from   person p
+       join owns o on o.id = p.id
+       join car c  on c.license = o.license and c.brand in ('Toyota', 'Tesla')
+group by p.id, p.fname, p.lname
+having count(distinct c.brand) = 2</pre>
+      <p>היקום = {Toyota, Tesla}. רק מי שיש לו רכב מ<b>שני</b> היצרנים מתאים. בנתונים מוחזרת <b>Sara Cohen</b> (יש לה Tesla ו‑Toyota).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">שאלה 3 <span class="tag warm">חימום · "כל ה‑X הם Y" · ספרייה</span></div>
+    <div>הצג <code>author_id</code> ו‑<code>name</code> של כל סופר ש<b>כל</b> ספריו יצאו לאור בשנת <code>2010</code> ואילך. <span style="color:var(--muted); font-size:13.5px">(היקום תלוי‑ישות: ספרי הסופר.)</span></div>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select au.author_id, au.name
+from   Authors au
+where  not exists (select *
+                   from   Books b
+                   where  b.author_id = au.author_id and b.publ_year &lt; 2010)</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select au.author_id, au.name
+from   Authors au
+       join Books b on b.author_id = au.author_id and b.publ_year &gt;= 2010
+       join (select author_id aid, count(distinct isbn) cnt from Books group by author_id) tc
+            on tc.aid = au.author_id
+group by au.author_id, au.name, tc.cnt
+having count(distinct b.isbn) = tc.cnt</pre>
+      <p>"כל ספריו ≥2010" = אין לו ספר מלפני 2010. בנתונים מוחזרים מחברים 11 (B. Scholar), 15 (F. Tales) ו‑17 (H. Young).</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">שאלה 4 <span class="tag hard">קשה · חלוקה אמיתית · ספרייה</span></div>
+    <div>הצג <code>borrower_id</code> ו‑<code>name</code> של הקוראים שהשאילו ספר מ<b>כל אחד</b> מהז'אנרים בקבוצה <code>{Science, Fantasy, History}</code>. <span style="color:var(--muted); font-size:13.5px">(יקום קבוע בן 3 ז'אנרים — חלוקה קלאסית.)</span></div>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
+where  not exists (select *
+                   from   Genres g
+                   where  g.genre_name in ('Science', 'Fantasy', 'History')
+                     and  not exists (select *
+                                      from   Loans l join Book_Genres bg on bg.isbn = l.book_isbn
+                                      where  l.borrower_id = br.borrower_id
+                                        and  bg.genre_id = g.genre_id))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
+       join Loans l        on l.borrower_id = br.borrower_id
+       join Book_Genres bg on bg.isbn = l.book_isbn
+       join Genres g       on g.genre_id = bg.genre_id
+                          and g.genre_name in ('Science', 'Fantasy', 'History')
+group by br.borrower_id, br.name
+having count(distinct g.genre_id) = 3</pre>
+      <p>היקום = 3 הז'אנרים. רק מי שכיסה את שלושתם מתאים. בנתונים מוחזרים Dana, Tal, Adi ו‑Shai.</p>
+    </div>
+  </div>
+
+  <div class="ex">
+    <div class="task">שאלה 5 <span class="tag hard">קשה · יקום נגזר · ספרייה</span></div>
+    <div>הספר <code>'B015'</code> משויך לכמה ז'אנרים. הצג <code>borrower_id</code> ו‑<code>name</code> של הקוראים שהשאילו ספר מ<b>כל אחד</b> מהז'אנרים שאליהם משויך <code>'B015'</code>. <span style="color:var(--muted); font-size:13.5px">(היקום נגזר — חשבו אותו בתת‑שאילתה, בדיוק כמו בתרגיל 3 של השיעור.)</span></div>
+    <textarea class="sql-box" data-schema="library" spellcheck="false" placeholder="select ..."></textarea>
+    <button class="reveal-btn" onclick="toggle(this)">הצג פתרון</button>
+    <div class="solution">
+      <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
+where  not exists (select *
+                   from   Book_Genres bgu
+                   where  bgu.isbn = 'B015'
+                     and  not exists (select *
+                                      from   Loans l join Book_Genres bg on bg.isbn = l.book_isbn
+                                      where  l.borrower_id = br.borrower_id
+                                        and  bg.genre_id = bgu.genre_id))</pre>
+      <p style="margin:10px 0 2px; color:var(--muted); font-size:14px">— צורת הספירה (שקולה):</p>
+      <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
+       join Loans l        on l.borrower_id = br.borrower_id
+       join Book_Genres bg on bg.isbn = l.book_isbn
+       join (select genre_id from Book_Genres where isbn = 'B015') u
+            on u.genre_id = bg.genre_id
+group by br.borrower_id, br.name
+having count(distinct bg.genre_id) =
+       (select count(distinct genre_id) from Book_Genres where isbn = 'B015')</pre>
+      <p>היקום = הז'אנרים של <code>'B015'</code> (History ו‑Fiction). מי שכיסה את שניהם מתאים. בנתונים מוחזרים <b>Dana</b> ו‑<b>Shai</b>.</p>
+    </div>
+  </div>
+</section>
+
+<div class="backlink">← <a href="0008-division-for-all.html">חזרה לשיעור 8</a></div>
+
+<footer>
+  שיעור 8 · תרגול נוסף · קורס 131112<br>
+  לפתיחה: <code>open lessons/0008-extra-division-practice.html</code>
+</footer>
+
+</div>
+<script>
+  function toggle(btn){
+    var s=btn.nextElementSibling;
+    s.classList.toggle('show');
+    btn.textContent=s.classList.contains('show')?'הסתר פתרון':'הצג פתרון';
+  }
+  // SQL blocks (highlight + ▶ run + auto-grade) handled by ../assets/sql-blocks.js + sql-run.js
+</script>
+</body>
+</html>

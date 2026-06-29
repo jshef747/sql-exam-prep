@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>try{var t=localStorage.getItem('sqlTheme');if(!t&&typeof window.name=='string'&&window.name.indexOf('SQLBOXES:')===0){t=(JSON.parse(window.name.slice(9))||{}).__theme;}if(t==='dark'){document.documentElement.className+=' dark';}}catch(e){}</script>
+<link rel="stylesheet" href="../assets/dark.css">
+<title>שיעור 8 · תרגיל 3 — הסבר צעד‑אחר‑צעד</title>
+<style>
+  :root{
+    --bg:#f7f8fb; --card:#fff; --ink:#1a2233; --muted:#5b6b86;
+    --primary:#2b4a8b; --primary-soft:#eaf0fb; --line:#e2e8f2;
+    --accent:#0b8457; --accent-soft:#e6f4ee; --danger:#c0392b; --danger-soft:#fdecea;
+    --kw:#1d4ed8; --str:#b45309; --cmt:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{direction:rtl; margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Heebo','Assistant','Rubik','Segoe UI','Arial Hebrew',Arial,sans-serif;
+    line-height:1.8; font-size:17px}
+  .wrap{max-width:900px; margin:0 auto; padding:36px 22px 90px}
+  header.top{background:linear-gradient(135deg,#7c3aed,#3f6bc0); color:#fff;
+    border-radius:18px; padding:30px 32px; margin-bottom:22px; box-shadow:0 10px 30px rgba(43,74,139,.18)}
+  .lesson-badge{display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+    padding:3px 12px; border-radius:999px; font-size:13px; margin-bottom:12px}
+  header.top h1{margin:0 0 8px; font-size:27px}
+  header.top p{margin:0; opacity:.93}
+  .backlink{margin:0 0 18px}
+  .backlink a{color:var(--primary); font-weight:600; text-decoration:none}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:22px 26px; margin-bottom:18px; box-shadow:0 2px 10px rgba(20,40,80,.04)}
+  h2{color:var(--primary); border-bottom:3px solid var(--primary-soft); padding-bottom:8px; margin-top:2px; font-size:21px}
+  .step{display:inline-block; background:var(--primary); color:#fff; border-radius:50%; width:30px; height:30px;
+    text-align:center; line-height:30px; font-weight:700; margin-left:8px}
+  code,.en{direction:ltr; unicode-bidi:isolate; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    background:#eef2f8; padding:1px 6px; border-radius:5px; font-size:.9em; color:#0f2a5e}
+  pre.sql{direction:ltr; text-align:left; unicode-bidi:isolate;
+    font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; line-height:1.65;
+    background:#f3f5f9; border:1px solid var(--line); border-right:4px solid var(--primary);
+    border-radius:10px; padding:14px 16px; overflow-x:auto; margin:12px 0}
+  pre.sql .kw{color:var(--kw); font-weight:700}
+  pre.sql .str{color:var(--str)}
+  pre.sql .cmt{color:var(--cmt); font-style:italic}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:15px}
+  th,td{border:1px solid var(--line); padding:8px 11px; text-align:right}
+  th{background:var(--primary-soft); color:var(--primary)}
+  tr:nth-child(even) td{background:#fafbfe}
+  td code{background:#eef2f8}
+  .yes{color:var(--accent); font-weight:700}
+  .no{color:var(--danger); font-weight:700}
+  .hit td{background:#e6f4ee}
+  .note{background:#fff8e6; border:1px solid #f3e0a8; border-radius:12px; padding:13px 18px; margin:14px 0}
+  .exam{background:#eef7f1; border:1px solid #bfe3d2; border-radius:12px; padding:12px 18px; margin:14px 0; color:#0a5d3f}
+  .q{background:var(--primary-soft); border:1px solid #cfdcf3; border-radius:12px; padding:12px 18px; margin:0 0 6px}
+  a{color:var(--primary)}
+  footer{color:var(--muted); font-size:14px; text-align:center; margin-top:26px}
+  @media print{body{background:#fff} section{box-shadow:none}}
+</style>
+<script src="../assets/sql-blocks.js" defer></script>
+<script src="../assets/sql-run.js" defer></script>
+</head>
+<body data-schema="library">
+<div class="wrap">
+
+<header class="top">
+  <div class="lesson-badge">שיעור 8 · תרגיל 3 · הסבר מורחב</div>
+  <h1>חלוקה שבה ה"יקום" נגזר משאלה אחרת — צעד אחר צעד</h1>
+  <p>זו השאלה הכי קשה בשיעור, כי הקבוצה שצריך "לכסות" אינה כתובה במפורש — צריך לחשב אותה. נפרק אותה לחתיכות, עם הנתונים האמיתיים מול העיניים.</p>
+</header>
+
+<div class="backlink">← <a href="0008-division-for-all.html">חזרה לשיעור 8 (חלוקה / "לכל")</a></div>
+
+<section>
+  <div class="q">🎓 <b>השאלה:</b> סופר <code>13</code> (<code>D. Quill</code>) כתב ספרים בכמה ז'אנרים. מצא את ה<b>קוראים</b> (<code>borrower_id</code>, <code>name</code>) שהשאילו ספר מ<b>כל אחד</b> מהז'אנרים שבהם כתב סופר 13.</div>
+  <p>שימו לב למילה "<b>כל</b>" — זה הסימן לשאלת <b>חלוקה</b> ("לכל"). ההבדל מהשאלות הקודמות: כאן ה"יקום" (אוסף הז'אנרים שצריך לכסות) <b>לא נתון כקבוע</b> כמו <code>'Jaffa'</code> או <code>'Fantasy'</code> — הוא בעצמו תוצאה של שאילתה ("הז'אנרים של סופר 13").</p>
+</section>
+
+<section>
+  <h2><span class="step">1</span>מזהים את שלושת החלקים</h2>
+  <p>בכל שאלת "לכל" שואלים שלוש שאלות:</p>
+  <table>
+    <tr><th>חלק</th><th>בשאלה הזו</th></tr>
+    <tr><td><b>הישות</b> (מי מוחזר?)</td><td>ה<b>קורא</b> (<code>borrower</code>) — לכן <code>group by</code> על הקורא.</td></tr>
+    <tr><td><b>היקום</b> (מה צריך לכסות?)</td><td>ה<b>ז'אנרים שסופר 13 כתב בהם</b> — לא קבוע, מחשבים בתת‑שאילתה.</td></tr>
+    <tr><td><b>ההתאמה</b> (מתי הישות "מכסה" איבר?)</td><td>הקורא <b>השאיל ספר</b> מאותו ז'אנר (יש לו שורה ב‑<code>Loans</code> לספר מהז'אנר).</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="step">2</span>מחשבים את היקום — מה הם הז'אנרים של סופר 13?</h2>
+  <p>סופר 13 כתב שני ספרים. נסתכל על הז'אנרים שלהם:</p>
+  <table>
+    <tr><th>ספר של סופר 13</th><th>ז'אנרים</th></tr>
+    <tr><td><code>B012</code> (Castles)</td><td>Fantasy, History</td></tr>
+    <tr><td><code>B015</code> (Kingdom)</td><td>History, Fiction</td></tr>
+  </table>
+  <p>מאחדים ומורידים כפילויות ⟵ <b>היקום = { Fantasy, History, Fiction }</b> — שלושה ז'אנרים. ב‑SQL:</p>
+  <pre class="sql">select distinct g.genre_name
+from   Books b join Book_Genres bg on bg.isbn = b.isbn
+               join Genres g       on g.genre_id = bg.genre_id
+where  b.author_id = 13</pre>
+  <p>הריצו (▶) — תקבלו בדיוק 3 שורות. <b>המספר 3 הזה</b> הוא "גודל היקום", ונשתמש בו בהמשך.</p>
+</section>
+
+<section>
+  <h2><span class="step">3</span>לכל קורא — אילו מ‑3 הז'אנרים האלה הוא כיסה?</h2>
+  <p>עכשיו נצליב: לכל קורא, מאילו מתוך { Fantasy, History, Fiction } הוא השאיל ספר. הריצו:</p>
+  <pre class="sql">select br.name, g.genre_name
+from   Borrowers br
+       join Loans l        on l.borrower_id = br.borrower_id
+       join Book_Genres bg on bg.isbn = l.book_isbn
+       join Genres g       on g.genre_id = bg.genre_id
+where  g.genre_id in (select distinct bg2.genre_id
+                      from   Books b2 join Book_Genres bg2 on bg2.isbn = b2.isbn
+                      where  b2.author_id = 13)
+group by br.name, g.genre_name
+order by br.name, g.genre_name</pre>
+  <p>זה מה שיוצא, מסוכם לכל קורא — ומי כיסה את <b>כל</b> השלושה:</p>
+  <table>
+    <tr><th>קורא</th><th>ז'אנרים שכיסה (מתוך 3)</th><th>כיסה את כולם?</th></tr>
+    <tr class="hit"><td>Dana (200)</td><td>Fantasy, History, Fiction</td><td class="yes">✓ כן (3/3)</td></tr>
+    <tr><td>Eli (201)</td><td>Fantasy, Fiction</td><td class="no">✗ חסר History</td></tr>
+    <tr><td>Rotem (202)</td><td>History</td><td class="no">✗ חסרים 2</td></tr>
+    <tr><td>Noam (203)</td><td>Fantasy, Fiction</td><td class="no">✗ חסר History</td></tr>
+    <tr><td>Tal (204)</td><td>Fantasy, History</td><td class="no">✗ חסר Fiction</td></tr>
+    <tr><td>Adi (205)</td><td>Fantasy, History</td><td class="no">✗ חסר Fiction</td></tr>
+    <tr><td>Yarden (206)</td><td>Fantasy</td><td class="no">✗ חסרים 2</td></tr>
+    <tr class="hit"><td>Shai (207)</td><td>Fantasy, History, Fiction</td><td class="yes">✓ כן (3/3)</td></tr>
+  </table>
+  <p>אז התשובה היא <b>Dana</b> ו‑<b>Shai</b>. כל מה שנשאר — להגיד את "כיסה את כל השלושה" בשפת SQL. יש שתי דרכים.</p>
+</section>
+
+<section>
+  <h2><span class="step">4</span>דרך א' — ספירה: "כמה כיסה = גודל היקום"</h2>
+  <p>קורא כיסה את כל הז'אנרים בדיוק אם <b>מספר הז'אנרים השונים שכיסה (מתוך היקום)</b> שווה ל<b>גודל היקום</b> (3). זה בדיוק מה שראינו בטבלה.</p>
+  <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
+       join Loans l        on l.borrower_id = br.borrower_id
+       join Book_Genres bg on bg.isbn = l.book_isbn
+       join (select distinct bg2.genre_id
+             from   Books b2 join Book_Genres bg2 on bg2.isbn = b2.isbn
+             where  b2.author_id = 13) u on u.genre_id = bg.genre_id
+group by br.borrower_id, br.name
+having count(distinct bg.genre_id) =
+       (select count(distinct bg3.genre_id)
+        from   Books b3 join Book_Genres bg3 on bg3.isbn = b3.isbn
+        where  b3.author_id = 13)</pre>
+  <p>מה כל חלק עושה:</p>
+  <table>
+    <tr><th>חלק בשאילתה</th><th>תפקיד</th></tr>
+    <tr><td>ה‑<code>join</code> ל‑<code>u</code></td><td><code>u</code> = היקום (הז'אנרים של סופר 13). הצירוף אליו <b>מסנן</b> את ההשאלות ומשאיר רק כאלה שהז'אנר שלהן בתוך היקום.</td></tr>
+    <tr><td><code>group by br...</code></td><td>קבוצה לכל קורא (זו הישות).</td></tr>
+    <tr><td><code>count(distinct bg.genre_id)</code></td><td>כמה ז'אנרים <b>שונים</b> מהיקום הקורא כיסה. ה‑<code>distinct</code> חיוני — אם הקורא השאיל שני ספרי Fantasy, עדיין זה ז'אנר אחד.</td></tr>
+    <tr><td><code>having ... = (select count(distinct ...) ... author_id = 13)</code></td><td>משווה ל<b>גודל היקום</b> (3). שווה ⟵ כיסה את כולם.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="step">5</span>דרך ב' — הצורה הקלאסית של הבחינה: <code>not exists</code> כפול</h2>
+  <p>הניסוח המילולי: "קורא שב<b>אין</b> אף ז'אנר של סופר 13 ש<b>אין</b> לו ספר מושאל ממנו." שתי שלילות — שתי <code>not exists</code>:</p>
+  <pre class="sql">select br.borrower_id, br.name
+from   Borrowers br
+where  not exists (select *                                   -- אין ז'אנר של סופר 13...
+                   from   Books b2 join Book_Genres bg2 on bg2.isbn = b2.isbn
+                   where  b2.author_id = 13
+                     and  not exists (select *                -- ...שאין לקורא ספר מושאל ממנו
+                                      from   Loans l join Book_Genres bg on bg.isbn = l.book_isbn
+                                      where  l.borrower_id = br.borrower_id
+                                        and  bg.genre_id = bg2.genre_id))</pre>
+  <p>קוראים אותה <b>מבפנים החוצה</b>:</p>
+  <table>
+    <tr><th>שכבה</th><th>מה היא בודקת</th></tr>
+    <tr><td><b>הפנימית ביותר</b></td><td>"לקורא יש ספר מושאל מהז'אנר <code>bg2.genre_id</code>" (התאמה בודדת).</td></tr>
+    <tr><td><b><code>not exists</code> הפנימי</b></td><td>"זהו ז'אנר (של סופר 13) ש<b>אין</b> לקורא ספר ממנו" — ז'אנר שהקורא <b>פספס</b>.</td></tr>
+    <tr><td><b><code>not exists</code> החיצוני</b></td><td>"<b>אין אף</b> ז'אנר כזה שפספס" = הקורא כיסה את <b>כל</b> ז'אנרי סופר 13. ✓</td></tr>
+  </table>
+  <div class="exam">📐 <b>הקשר לאלגברה היחסית:</b> זו בדיוק חלוקה (<code>÷</code>). ה‑<code>not exists</code> הכפול הוא התרגום הישיר של ההגדרה "כל האנשים, פחות מי שיש ז'אנר שפספס". שתי הצורות (ספירה / <code>not exists</code> כפול) שקולות לחלוטין ושתיהן רצות במנוע כאן.</div>
+</section>
+
+<section>
+  <h2><span class="step">6</span>התוצאה</h2>
+  <p>שתי הדרכים מחזירות את אותו דבר:</p>
+  <table>
+    <tr><th>borrower_id</th><th>name</th></tr>
+    <tr class="hit"><td>200</td><td>Dana</td></tr>
+    <tr class="hit"><td>207</td><td>Shai</td></tr>
+  </table>
+  <div class="note">🧠 <b>הלקח להבא:</b> כשהיקום "נגזר" (למשל "כל הז'אנרים של סופר X", "כל המוסכים בעיר Y") — קודם כתבו את תת‑השאילתה שמחזירה את היקום, בִּדקו אותה לבד (▶), ורק אז הרכיבו סביבה את החלוקה. זה בדיוק מה שעשינו כאן בצעדים 2 → 3 → 4/5.</div>
+</section>
+
+<div class="backlink">← <a href="0008-division-for-all.html">חזרה לשיעור 8</a></div>
+
+<footer>
+  שיעור 8 · תרגיל 3 · הסבר מורחב · קורס 131112<br>
+  לפתיחה: <code>open lessons/0008-exercise3-explained.html</code>
+</footer>
+
+</div>
+<script>
+  // SQL blocks (static highlight + ▶ run) handled by ../assets/sql-blocks.js + sql-run.js
+</script>
+</body>
+</html>

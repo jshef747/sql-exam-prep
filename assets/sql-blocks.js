@@ -18,14 +18,16 @@
   var DEFAULT = 'highlight';
 
   function getMode() {
-    var h = (location.hash.match(/sqlmode=(\w+)/) || [])[1];
-    if (h && MODES.indexOf(h) >= 0) { try { localStorage.setItem('sqlMode', h); } catch (e) {} return h; }
+    // Persist the mode in the same window.name+localStorage store as the boxes,
+    // NOT in location.hash: changing the URL hash on a file:// page makes the
+    // browser reset the page zoom on the reload below.
+    try { var s = readStore(); if (s.__mode && MODES.indexOf(s.__mode) >= 0) return s.__mode; } catch (e) {}
     try { var m = localStorage.getItem('sqlMode'); if (m && MODES.indexOf(m) >= 0) return m; } catch (e) {}
     return DEFAULT;
   }
   function setMode(m) {
     try { localStorage.setItem('sqlMode', m); } catch (e) {}
-    location.hash = 'sqlmode=' + m;      // carries the choice through the reload even without localStorage
+    try { var s = readStore(); s.__mode = m; writeStore(s); } catch (e) {}  // survives reload, no URL change -> zoom kept
     location.reload();
   }
 
@@ -157,6 +159,10 @@
       if (window.name && window.name.indexOf(WN_PREFIX) === 0) {
         var wn = JSON.parse(window.name.slice(WN_PREFIX.length)) || {};
         for (var p in wn) {                       // merge: keep localStorage values, fill gaps from window.name
+          if (typeof wn[p] !== 'object' || wn[p] === null) {   // scalar entries like __mode (a string)
+            if (data[p] == null) data[p] = wn[p];
+            continue;
+          }
           if (!data[p]) data[p] = wn[p];
           else for (var k in wn[p]) if (data[p][k] == null) data[p][k] = wn[p][k];
         }
@@ -184,8 +190,46 @@
     });
   }
 
+  /* ---------- dark theme ---------- */
+  function readTheme() {
+    try { var t = localStorage.getItem('sqlTheme'); if (t === 'dark' || t === 'light') return t; } catch (e) {}
+    try { var s = readStore(); if (s.__theme === 'dark' || s.__theme === 'light') return s.__theme; } catch (e) {}
+    return 'light';
+  }
+  function saveTheme(t) {
+    try { localStorage.setItem('sqlTheme', t); } catch (e) {}
+    try { var s = readStore(); s.__theme = t; writeStore(s); } catch (e) {}   // survives Safari file:// via window.name
+  }
+  function applyTheme(t) { document.documentElement.classList.toggle('dark', t === 'dark'); }
+  function injectThemeBtnCSS() {
+    if (document.getElementById('themebtn-css')) return;
+    var s = document.createElement('style'); s.id = 'themebtn-css';
+    s.textContent = '#themebtn{position:fixed;top:10px;right:10px;z-index:9999;width:40px;height:40px;' +
+      'border-radius:50%;border:1px solid #d6e2f6;background:#fff;cursor:pointer;font-size:19px;line-height:1;' +
+      'box-shadow:0 4px 14px rgba(20,40,80,.15)}@media print{#themebtn{display:none}}';
+    document.head.appendChild(s);
+  }
+  function buildThemeToggle() {
+    if (document.getElementById('themebtn')) return;
+    var b = document.createElement('button'); b.id = 'themebtn'; b.type = 'button';
+    function paint() {
+      var dark = document.documentElement.classList.contains('dark');
+      b.textContent = dark ? '☀️' : '🌙';   // ☀️ / 🌙
+      b.title = dark ? 'מצב בהיר' : 'מצב כהה';
+      b.setAttribute('aria-label', b.title);
+    }
+    paint();
+    b.addEventListener('click', function () {
+      var dark = !document.documentElement.classList.contains('dark');
+      applyTheme(dark ? 'dark' : 'light'); saveTheme(dark ? 'dark' : 'light'); paint();
+    });
+    document.body.appendChild(b);
+  }
+  function initTheme() { applyTheme(readTheme()); injectThemeBtnCSS(); buildThemeToggle(); }
+
   /* ---------- boot ---------- */
   function go() {
+    initTheme();                          // dark mode on every page, before anything else
     highlightStatic();
     var boxes = [].slice.call(document.querySelectorAll('textarea.sql-box'));
     if (!boxes.length) return;            // no practice boxes -> no toggle (e.g. glossary)
